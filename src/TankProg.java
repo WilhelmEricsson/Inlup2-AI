@@ -9,6 +9,11 @@
     import processing.core.*;
 
     public class TankProg extends PApplet {
+
+        public static void main(String[] args) {
+            PApplet.main("TankProg");
+        }
+
     /* Ljud
     Minim minim;
     SoundManager soundManager;*/
@@ -65,29 +70,19 @@
         int startTime = 1; //minutes
         int remainingTime;
 
-
-        //-------------------------------------------MAIN-----------------------------------------------------------------
-
-        public static void main(String[] args){
-            PApplet.main("TankProg");
-        }
-
-
-
-
-        //----------------------------------------------------------------------------------------------------------------
-
         public Grid getGrid() {
             return grid;
         }
+
+        Util u = new Util(this);
+
         @Override
-        public void settings(){
+        public void settings() {
             size(800, 800);
         }
 
         @Override
         public void setup() {
-
         /* LJUD!
         soundManager = new SoundManager(this);
         soundManager.addSound("tank_firing");
@@ -127,7 +122,7 @@
 
 
             // nytt Team: id, color, tank0pos, id, shot
-            teams[0] = new Team1(this,0, tank_size, team0Color,
+            teams[0] = new Team1(this, 0, tank_size, team0Color,
                     team0_tank0_startpos, 0, allShots[0],
                     team0_tank1_startpos, 1, allShots[1],
                     team0_tank2_startpos, 2, allShots[2]);
@@ -136,7 +131,7 @@
             allTanks[1] = teams[0].tanks[1];
             allTanks[2] = teams[0].tanks[2];
 
-            teams[1] = new Team2(this,1, tank_size, team1Color,
+            teams[1] = new Team2(this, 1, tank_size, team1Color,
                     team1_tank0_startpos, 3, allShots[3],
                     team1_tank1_startpos, 4, allShots[4],
                     team1_tank2_startpos, 5, allShots[5]);
@@ -146,7 +141,7 @@
             allTanks[5] = teams[1].tanks[2];
 
             Util.loadShots();
-            userControl = false;
+            userControl = true;
             tankInFocus = 0;
 
             savedTime = millis(); //store the current time.
@@ -156,6 +151,7 @@
             timer.setDirection("down");
             timer.setTime(startTime);
         }
+
         @Override
         public void draw() {
             background(200);
@@ -165,7 +161,7 @@
                 // timer används inte i dagsläget.
                 timer.tick(); // Alt.1
                 float deltaTime = timer.getDeltaSec();
-                remainingTime = (int)timer.getTotalTime();
+                remainingTime = (int) timer.getTotalTime();
                 if (remainingTime <= 0) {
                     remainingTime = 0;
                     timer.pause();
@@ -205,9 +201,156 @@
 
         }
 
+        public void mousePressed() {
+            System.out.println("---------------------------------------------------------");
+            System.out.println("*** mousePressed() - Musknappen har tryckts ned.");
+
+            mouse_pressed = true;
+
+        }
+
+
         // Används inte
         float getTime() {
             return 0; //Dummy temp
         }
+
+        public void keyPressed() {
+            if (userControl) {
+
+                if (key == CODED) {
+                    switch (keyCode) {
+                        case PApplet.LEFT:
+                            //myTank1_snd.engineStart();
+                            left = true;
+                            break;
+                        case PApplet.RIGHT:
+                            //myTank_snd.engineStart();
+                            right = true;
+                            break;
+                        case PApplet.UP:
+                            //myTank_snd.engineStart();
+                            up = true;
+                            break;
+                        case PApplet.DOWN:
+                            //myTank_snd.engineStart();
+                            down = true;
+                            break;
+                        case PApplet.ALT:
+                            // turret.
+                            alt_key = true;
+                            break;
+                    }
+                }
+                if (key == ' ') {
+                    //myAudio.shot();
+                    //myAudio.blast();
+                    //myTank1.fire();
+                    System.out.println("keyPressed SPACE");
+                    allTanks[tankInFocus].fire();
+                }
+            }
+
+            if (key == 'c') {
+                userControl = !userControl;
+
+//    allTanks[tankInFocus].stopMoving_state();
+//    allTanks[tankInFocus].stopTurning_state();
+//    allTanks[tankInFocus].stopTurretTurning_state();
+
+                if (!userControl) {
+                    allTanks[tankInFocus].releaseControl();
+
+                } else {
+                    allTanks[tankInFocus].takeControl();
+                }
+            }
+
+            if (key == 'p') {
+                pause = !pause;
+                if (pause) {
+                    timer.pause();
+                } else {
+                    timer.resume();
+                }
+            }
+
+            if (key == 'd') {
+                debugOn = !debugOn;
+            }
+        }
+
+        public void keyReleased() {
+            if (userControl) {
+
+                if (key == CODED) {
+                    switch (keyCode) {
+                        case PApplet.LEFT:
+                            //myTank_snd.engineStop();
+                            left = false;
+                            allTanks[tankInFocus].stopTurning_state();
+                            break;
+                        case PApplet.RIGHT:
+                            //myTank_snd.engineStop();
+                            right = false;
+                            allTanks[tankInFocus].stopTurning_state();
+                            break;
+                        case PApplet.UP:
+                            //myTank_snd.engineStop();
+                            up = false;
+                            allTanks[tankInFocus].stopMoving_state();
+                            break;
+                        case PApplet.DOWN:
+                            //myTank_snd.engineStop();
+                            down = false;
+                            allTanks[tankInFocus].stopMoving_state();
+                            break;
+                        case PApplet.ALT:
+                            // turret.
+                            alt_key = false;
+                            allTanks[tankInFocus].stopTurretTurning_state();
+                    }
+                }
+            }
+        }
+
+        public void keyTyped() {
+
+            if (userControl) {
+                switch (key) {
+                    case '1':
+                        allTanks[tankInFocus].releaseControl();
+                        tankInFocus = 1;
+                        allTanks[tankInFocus].takeControl();
+                        break;
+                    case '2':
+                        allTanks[tankInFocus].releaseControl();
+                        tankInFocus = 2;
+                        allTanks[tankInFocus].takeControl();
+                        break;
+                    case '3':
+                        allTanks[tankInFocus].releaseControl();
+                        tankInFocus = 3;
+                        allTanks[tankInFocus].takeControl();
+                        break;
+                    case '4':
+                        allTanks[tankInFocus].releaseControl();
+                        tankInFocus = 4;
+                        allTanks[tankInFocus].takeControl();
+                        break;
+                    case '5':
+                        allTanks[tankInFocus].releaseControl();
+                        tankInFocus = 5;
+                        allTanks[tankInFocus].takeControl();
+                        break;
+                    case '0':
+                        allTanks[tankInFocus].releaseControl();
+                        tankInFocus = 0;
+                        allTanks[tankInFocus].takeControl();
+                        break;
+                }
+            }
+        }
+
 
     }
