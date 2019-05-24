@@ -206,6 +206,7 @@
             mouse_pressed = true;
 
         }
+        
 
         // Används inte
         float getTime() {
