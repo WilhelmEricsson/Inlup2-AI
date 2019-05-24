@@ -1192,4 +1192,8 @@ class Tank extends Sprite {
             }
         }
     }
+
+    public TankProg getTp(){
+        return tp;
+    }
 }
