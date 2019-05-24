@@ -1,15 +1,24 @@
+
+import processing.core.*;
+
+
 public class Util {
+    private static TankProg tp;
+
+    public Util(TankProg tp){
+        this.tp = tp;
+    }
 
     // call to Team updateLogic()
-    void updateTeamsLogic() {
-        teams[0].updateLogic();
-        teams[1].updateLogic();
+    public static void updateTeamsLogic() {
+        tp.teams[0].updateLogic();
+        tp.teams[1].updateLogic();
     }
 
     // call to Tank updateLogic()
-    void updateTanksLogic() {
+    public static void updateTanksLogic() {
 
-        for (Tank tank : allTanks) {
+        for (Tank tank : tp.allTanks) {
             if (tank.isReady) {
                 tank.updateLogic();
             }
@@ -21,9 +30,9 @@ public class Util {
     }
 
     // call to Tank update()
-    void updateTanks() {
+    public static void updateTanks() {
 
-        for (Tank tank : allTanks) {
+        for (Tank tank : tp.allTanks) {
             //if (tank.health > 0)
             tank.update();
         }
@@ -33,74 +42,74 @@ public class Util {
         //}
     }
 
-    void updateShots() {
-        for (int i = 0; i < allShots.length; i++) {
-            if ((allShots[i].passedTime > wait) && (!allTanks[i].hasShot)) {
-                allShots[i].resetTimer();
-                allTanks[i].loadShot();
+    public static void updateShots() {
+        for (int i = 0; i < tp.allShots.length; i++) {
+            if ((tp.allShots[i].passedTime > tp.wait) && (!tp.allTanks[i].hasShot)) {
+                tp.allShots[i].resetTimer();
+                tp.allTanks[i].loadShot();
             }
-            allShots[i].update();
+            tp.allShots[i].update();
         }
     }
 
-    void checkForCollisionsShots() {
-        for (int i = 0; i < allShots.length; i++) {
-            if (allShots[i].isInMotion) {
-                for (int j = 0; j<allTrees.length; j++) {
-                    allShots[i].checkCollision(allTrees[j]);
+    public static void checkForCollisionsShots() {
+        for (int i = 0; i < tp.allShots.length; i++) {
+            if (tp.allShots[i].isInMotion) {
+                for (int j = 0; j < tp.allTrees.length; j++) {
+                    tp.allShots[i].checkCollision(tp.allTrees[j]);
                 }
 
-                for (int j = 0; j < allTanks.length; j++) {
-                    if (j != allTanks[i].getId()) {
-                        allShots[i].checkCollision(allTanks[j]);
+                for (int j = 0; j < tp.allTanks.length; j++) {
+                    if (j != tp.allTanks[i].getId()) {
+                        tp.allShots[i].checkCollision(tp.allTanks[j]);
                     }
                 }
             }
         }
     }
 
-    void checkForCollisionsTanks() {
+    public static void checkForCollisionsTanks() {
         // Check for collisions with Canvas Boundaries
-        for (int i = 0; i < allTanks.length; i++) {
-            allTanks[i].checkEnvironment();
+        for (int i = 0; i < tp.allTanks.length; i++) {
+            tp.allTanks[i].checkEnvironment();
 
             // Check for collisions with "no Smart Objects", Obstacles (trees, etc.)
-            for (int j = 0; j < allTrees.length; j++) {
-                allTanks[i].checkCollision(allTrees[j]);
+            for (int j = 0; j < tp.allTrees.length; j++) {
+                tp.allTanks[i].checkCollision(tp.allTrees[j]);
             }
 
             // Check for collisions with "Smart Objects", other Tanks.
-            for (int j = 0; j < allTanks.length; j++) {
+            for (int j = 0; j < tp.allTanks.length; j++) {
                 //if ((allTanks[i].getId() != j) && (allTanks[i].health > 0)) {
-                if (allTanks[i].getId() != j) {
-                    allTanks[i].checkCollision(allTanks[j]);
+                if (tp.allTanks[i].getId() != j) {
+                    tp.allTanks[i].checkCollision(tp.allTanks[j]);
                 }
             }
         }
     }
 
-    void loadShots() {
-        for (int i = 0; i < allTanks.length; i++) {
-            allTanks[i].loadShot();
+    public static void loadShots() {
+        for (int i = 0; i < tp.allTanks.length; i++) {
+            tp.allTanks[i].loadShot();
         }
     }
 
     //void shoot(Tank id, PVector pvec) {
-    void shoot(int id) {
-        println("App.shoot()");
+    public static void shoot(int id) {
+        System.out.println("App.shoot()");
         // println(id +": "+ pvec);
         //allShots.get(id).setStartPosition(pvec);
 
         //myAudio.blast();
 
-        allShots[id].isInMotion = true;
-        allShots[id].startTimer();
+        tp.allShots[id].isInMotion = true;
+        tp.allShots[id].startTimer();
     }
 
-    void setTargetPosition(PVector pvec) {
-        PVector nodevec = grid.getNearestNodePosition(pvec);
+    public static void setTargetPosition(PVector pvec) {
+        PVector nodevec = tp.grid.getNearestNodePosition(pvec);
         //allTanks[tankInFocus].moveTo(pvec);
-        allTanks[tankInFocus].moveTo(nodevec);
+        tp.allTanks[tp.tankInFocus].moveTo(nodevec);
     }
 
 //******************************************************
@@ -108,14 +117,15 @@ public class Util {
     /**
      * Find the point of intersection between two lines.
      * This method uses PVector objects to represent the line end points.
+     *
      * @param v0 start of line 1
      * @param v1 end of line 1
      * @param v2 start of line 2
      * @param v3 end of line 2
      * @return a PVector object holding the intersection coordinates else null if no intersection
      */
-    public PVector line_line_p(PVector v0, PVector v1, PVector v2, PVector v3){
-        final double ACCY   = 1E-30;
+    public static PVector line_line_p(PVector v0, PVector v1, PVector v2, PVector v3) {
+        final double ACCY = 1E-30;
         PVector intercept = null;
 
         double f1 = (v1.x - v0.x);
@@ -126,22 +136,23 @@ public class Util {
         double f2g1 = f2 * g1;
         double det = f2g1 - f1g2;
 
-        if(abs((float)det) > (float)ACCY){
-            double s = (f2*(v2.y - v0.y) - g2*(v2.x - v0.x))/ det;
-            double t = (f1*(v2.y - v0.y) - g1*(v2.x - v0.x))/ det;
-            if(s >= 0 && s <= 1 && t >= 0 && t <= 1)
-                intercept = new PVector((float)(v0.x + f1 * s), (float)(v0.y + g1 * s));
+        if (tp.abs((float) det) > (float) ACCY) {
+            double s = (f2 * (v2.y - v0.y) - g2 * (v2.x - v0.x)) / det;
+            double t = (f1 * (v2.y - v0.y) - g1 * (v2.x - v0.x)) / det;
+            if (s >= 0 && s <= 1 && t >= 0 && t <= 1)
+                intercept = new PVector((float) (v0.x + f1 * s), (float) (v0.y + g1 * s));
         }
         return intercept;
     }
 
 //******************************************************
 //Används inte.
+
     /**
      * Put angle in degrees into [0, 360) range
      */
 //  public static float fixAngle(float angle) {
-    float fixAngle(float angle) {
+    public static float fixAngle(float angle) {
         while (angle < 0f)
             angle += 360f;
         while (angle >= 360f)
@@ -151,7 +162,7 @@ public class Util {
 
     //Används inte.
 //public static float relativeAngle(float delta){
-    float relativeAngle(float delta){
+    public static float relativeAngle(float delta) {
         while (delta < 180f)
             delta += 360f;
         while (delta >= 180f)
@@ -160,302 +171,298 @@ public class Util {
     }
 
 
-
     // Mouse functions
 
 
-
     // Mousebuttons
-    void mousePressed() {
-        println("---------------------------------------------------------");
-        println("*** mousePressed() - Musknappen har tryckts ned.");
+    public static void mousePressed() {
+        System.out.println("---------------------------------------------------------");
+        System.out.println("*** mousePressed() - Musknappen har tryckts ned.");
 
-        mouse_pressed = true;
+        tp.mouse_pressed = true;
 
     }
 
-    void checkForInput() {
-        if (userControl) {
+    public static void checkForInput() {
+        if (tp.userControl) {
 
-            if (alt_key) {
+            if (tp.alt_key) {
                 //println("alt_key: " + alt_key);
-                if (left) {
-                    allTanks[tankInFocus].turnTurretLeft_state();
-                } else if (right) {
-                    allTanks[tankInFocus].turnTurretRight_state();
+                if (tp.left) {
+                    tp.allTanks[tp.tankInFocus].turnTurretLeft_state();
+                } else if (tp.right) {
+                    tp.allTanks[tp.tankInFocus].turnTurretRight_state();
                 }
-            } else
-            if (!alt_key) {
+            } else if (!tp.alt_key) {
 
-                if (left) {
-                    allTanks[tankInFocus].turnLeft_state();
-                } else if (right) {
-                    allTanks[tankInFocus].turnRight_state();
-                }
-
-                if (up) {
-                    allTanks[tankInFocus].moveForward_state();
-                } else if (down) {
-                    allTanks[tankInFocus].moveBackward_state();
+                if (tp.left) {
+                    tp.allTanks[tp.tankInFocus].turnLeft_state();
+                } else if (tp.right) {
+                    tp.allTanks[tp.tankInFocus].turnRight_state();
                 }
 
-                if (!(up || down)) {
+                if (tp.up) {
+                    tp.allTanks[tp.tankInFocus].moveForward_state();
+                } else if (tp.down) {
+                    tp.allTanks[tp.tankInFocus].moveBackward_state();
+                }
+
+                if (!(tp.up || tp.down)) {
                     //allTanks[tankInFocus].deaccelarate();
                     //allTanks[tankInFocus].stopMoving_state();
                 }
-                if (!(right || left)) {
+                if (!(tp.right || tp.left)) {
                     //allTanks[tankInFocus].deaccelarate();
                     //allTanks[tankInFocus].stopTurning_state();
                 }
             }
 
-            if (!(alt_key && (left || right))) {
+            if (!(tp.alt_key && (tp.left || tp.right))) {
                 //allTanks[tankInFocus].stopTurretTurning_state();
             }
 
-            if (mouse_pressed) {
-                println("if (mouse_pressed)");
+            if (tp.mouse_pressed) {
+                System.out.println("if (mouse_pressed)");
                 //allTanks[tankInFocus].spin(3);
-                int mx = mouseX;
-                int my = mouseY;
+                int mx = tp.mouseX;
+                int my = tp.mouseY;
 
                 setTargetPosition(new PVector(mx, my));
 
-                mouse_pressed = false;
+                tp.mouse_pressed = false;
             }
         }
     }
 
-    void keyPressed() {
-        if (userControl) {
+    public static void keyPressed() {
+        if (tp.userControl) {
 
-            if (key == CODED) {
-                switch(keyCode) {
-                    case LEFT:
+            if (tp.key == tp.CODED) {
+                switch (tp.keyCode) {
+                    case PApplet.LEFT:
                         //myTank1_snd.engineStart();
-                        left = true;
+                        tp.left = true;
                         break;
-                    case RIGHT:
+                    case PApplet.RIGHT:
                         //myTank_snd.engineStart();
-                        right = true;
+                        tp.right = true;
                         break;
-                    case UP:
+                    case PApplet.UP:
                         //myTank_snd.engineStart();
-                        up = true;
+                        tp.up = true;
                         break;
-                    case DOWN:
+                    case PApplet.DOWN:
                         //myTank_snd.engineStart();
-                        down = true;
+                        tp.down = true;
                         break;
-                    case ALT:
+                    case PApplet.ALT:
                         // turret.
-                        alt_key = true;
+                        tp.alt_key = true;
                         break;
                 }
             }
-            if (key == ' ') {
+            if (tp.key == ' ') {
                 //myAudio.shot();
                 //myAudio.blast();
                 //myTank1.fire();
-                println("keyPressed SPACE");
-                allTanks[tankInFocus].fire();
+                System.out.println("keyPressed SPACE");
+                tp.allTanks[tp.tankInFocus].fire();
             }
         }
 
-        if (key == 'c') {
-            userControl = !userControl;
+        if (tp.key == 'c') {
+            tp.userControl = !tp.userControl;
 
 //    allTanks[tankInFocus].stopMoving_state();
 //    allTanks[tankInFocus].stopTurning_state();
 //    allTanks[tankInFocus].stopTurretTurning_state();
 
-            if (!userControl) {
-                allTanks[tankInFocus].releaseControl();
+            if (!tp.userControl) {
+                tp.allTanks[tp.tankInFocus].releaseControl();
 
             } else {
-                allTanks[tankInFocus].takeControl();
+                tp.allTanks[tp.tankInFocus].takeControl();
             }
         }
 
-        if (key == 'p') {
-            pause = !pause;
-            if (pause) {
-                timer.pause();
+        if (tp.key == 'p') {
+            tp.pause = !tp.pause;
+            if (tp.pause) {
+                tp.timer.pause();
             } else {
-                timer.resume();
+                tp.timer.resume();
             }
         }
 
-        if (key == 'd') {
-            debugOn = !debugOn;
+        if (tp.key == 'd') {
+            tp.debugOn = !tp.debugOn;
         }
     }
 
-    void keyReleased() {
-        if (userControl) {
+    public static void keyReleased() {
+        if (tp.userControl) {
 
-            if (key == CODED) {
-                switch(keyCode) {
-                    case LEFT:
+            if (tp.key == tp.CODED) {
+                switch (tp.keyCode) {
+                    case PApplet.LEFT:
                         //myTank_snd.engineStop();
-                        left = false;
-                        allTanks[tankInFocus].stopTurning_state();
+                        tp.left = false;
+                        tp.allTanks[tp.tankInFocus].stopTurning_state();
                         break;
-                    case RIGHT:
+                    case PApplet.RIGHT:
                         //myTank_snd.engineStop();
-                        right = false;
-                        allTanks[tankInFocus].stopTurning_state();
+                        tp.right = false;
+                        tp.allTanks[tp.tankInFocus].stopTurning_state();
                         break;
-                    case UP:
+                    case PApplet.UP:
                         //myTank_snd.engineStop();
-                        up = false;
-                        allTanks[tankInFocus].stopMoving_state();
+                        tp.up = false;
+                        tp.allTanks[tp.tankInFocus].stopMoving_state();
                         break;
-                    case DOWN:
+                    case PApplet.DOWN:
                         //myTank_snd.engineStop();
-                        down = false;
-                        allTanks[tankInFocus].stopMoving_state();
+                        tp.down = false;
+                        tp.allTanks[tp.tankInFocus].stopMoving_state();
                         break;
-                    case ALT:
+                    case PApplet.ALT:
                         // turret.
-                        alt_key = false;
-                        allTanks[tankInFocus].stopTurretTurning_state();
+                        tp.alt_key = false;
+                        tp.allTanks[tp.tankInFocus].stopTurretTurning_state();
                 }
             }
         }
     }
 
-    public void keyTyped() {
+    public static void keyTyped() {
 
-        if (userControl) {
-            switch(key) {
+        if (tp.userControl) {
+            switch (tp.key) {
                 case '1':
-                    allTanks[tankInFocus].releaseControl();
-                    tankInFocus = 1;
-                    allTanks[tankInFocus].takeControl();
+                    tp.allTanks[tp.tankInFocus].releaseControl();
+                    tp.tankInFocus = 1;
+                    tp.allTanks[tp.tankInFocus].takeControl();
                     break;
                 case '2':
-                    allTanks[tankInFocus].releaseControl();
-                    tankInFocus = 2;
-                    allTanks[tankInFocus].takeControl();
+                    tp.allTanks[tp.tankInFocus].releaseControl();
+                    tp.tankInFocus = 2;
+                    tp.allTanks[tp.tankInFocus].takeControl();
                     break;
                 case '3':
-                    allTanks[tankInFocus].releaseControl();
-                    tankInFocus = 3;
-                    allTanks[tankInFocus].takeControl();
+                    tp.allTanks[tp.tankInFocus].releaseControl();
+                    tp.tankInFocus = 3;
+                    tp.allTanks[tp.tankInFocus].takeControl();
                     break;
                 case '4':
-                    allTanks[tankInFocus].releaseControl();
-                    tankInFocus = 4;
-                    allTanks[tankInFocus].takeControl();
+                    tp.allTanks[tp.tankInFocus].releaseControl();
+                    tp.tankInFocus = 4;
+                    tp.allTanks[tp.tankInFocus].takeControl();
                     break;
                 case '5':
-                    allTanks[tankInFocus].releaseControl();
-                    tankInFocus = 5;
-                    allTanks[tankInFocus].takeControl();
+                    tp.allTanks[tp.tankInFocus].releaseControl();
+                    tp.tankInFocus = 5;
+                    tp.allTanks[tp.tankInFocus].takeControl();
                     break;
                 case '0':
-                    allTanks[tankInFocus].releaseControl();
-                    tankInFocus = 0;
-                    allTanks[tankInFocus].takeControl();
+                    tp.allTanks[tp.tankInFocus].releaseControl();
+                    tp.tankInFocus = 0;
+                    tp.allTanks[tp.tankInFocus].takeControl();
                     break;
             }
         }
     }
 
 
-
-
-
     // Initiera användargränssnittet.
 // Används inte.
-    void setGUI() {
-        println("*** setGUI()- Användargränsnittet skapas.");
+    public static void setGUI() {
+        System.out.println("*** setGUI()- Användargränsnittet skapas.");
 
     }
+
     //**************************************************
 // Gör så att allt i användargränssnittet (GUI) visas.
-    void showGUI() {
+    public static void showGUI() {
         //println("*** showGUI()");
 
-        textSize(14);
-        fill(30);
-        text("Team1: "+teams[0].numberOfHits, 10, 20);
-        text("Team2: "+teams[1].numberOfHits, width-100, 20);
-        textSize(24);
-        text(remainingTime, width/2, 25);
-        textSize(14);
+        tp.textSize(14);
+        tp.fill(30);
+        tp.text("Team1: " + tp.teams[0].numberOfHits, 10, 20);
+        tp.text("Team2: " + tp.teams[1].numberOfHits, tp.width - 100, 20);
+        tp.textSize(24);
+        tp.text(tp.remainingTime, tp.width / 2, 25);
+        tp.textSize(14);
 
 
-        if (userControl) {
+        if (tp.userControl) {
             // Draw an ellipse at the mouse position
-            PVector mouse = new PVector(mouseX, mouseY);
-            fill(200);
-            stroke(0);
-            strokeWeight(2);
-            ellipse(mouse.x, mouse.y, 48, 48);
+            PVector mouse = new PVector(tp.mouseX, tp.mouseY);
+            tp.fill(200);
+            tp.stroke(0);
+            tp.strokeWeight(2);
+            tp.ellipse(mouse.x, mouse.y, 48, 48);
             //grid.displayNearestNode(mouseX, mouseY);
         }
 
 
-        if (debugOn) {
+        if (tp.debugOn) {
             // Visa framerate.
-            fill(30);
-            text("FPS:"+ floor(frameRate), 10, height-10);
+            tp.fill(30);
+            tp.text("FPS:" + tp.floor(tp.frameRate), 10, tp.height - 10);
 
             // Visa grid.
-            fill(205);
+            tp.fill(205);
             gridDisplay();
 
             // Visa musposition och den närmaste noden.
-            fill(255, 92, 92);
-            ellipse(mouseX, mouseY, 5, 5);
-            grid.displayNearestNode(mouseX, mouseY);
+            tp.fill(255, 92, 92);
+            tp.ellipse(tp.mouseX, tp.mouseY, 5, 5);
+            tp.grid.displayNearestNode(tp.mouseX, tp.mouseY);
         }
 
-        if (pause) {
-            textSize(36);
-            fill(30);
-            text("Paused!", width/2-100, height/2);
+        if (tp.pause) {
+            tp.textSize(36);
+            tp.fill(30);
+            tp.text("Paused!", tp.width / 2 - 100, tp.height / 2);
         }
 
-        if (gameOver) {
-            textSize(36);
-            fill(30);
-            text("Game Over!", width/2-100, height/2);
+        if (tp.gameOver) {
+            tp.textSize(36);
+            tp.fill(30);
+            tp.text("Game Over!", tp.width / 2 - 100, tp.height / 2);
         }
     }
+
     //**************************************************
 // Gör så att textfälten visas och uppdateras.
 // Används inte.
-    void showOutput() {
+    public static void showOutput() {
     }
 
-    void displayTrees() {
-        for (int i = 0; i<allTrees.length; i++) {
-            allTrees[i].display();
+    public static void displayTrees() {
+        for (int i = 0; i < tp.allTrees.length; i++) {
+            tp.allTrees[i].display();
         }
     }
 
 
-    void gridDisplay() {
-        strokeWeight(0.3);
+    public static void gridDisplay() {
+        tp.strokeWeight(0.3f);
 
-        grid.display();
+        tp.grid.display();
     }
 
-    void updateTanksDisplay() {
+    public static void updateTanksDisplay() {
         //for (int i = 0; i < allTanks.length; i++) {
         //  allTanks[i].display();
         //}
-        for (Tank tank : allTanks) {
+        for (Tank tank : tp.allTanks) {
             tank.display();
         }
     }
 
-    void updateShotsDisplay() {
-        for (int i = 0; i < allShots.length; i++) {
-            allShots[i].display();
+    public static void updateShotsDisplay() {
+        for (int i = 0; i < tp.allShots.length; i++) {
+            tp.allShots[i].display();
         }
     }
 
