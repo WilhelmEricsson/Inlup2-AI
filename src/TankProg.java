@@ -63,6 +63,10 @@
         int startTime = 1; //minutes
         int remainingTime;
 
+        public Grid getGrid() {
+            return grid;
+        }
+
         @Override
         public void setup() {
             size(800, 800);
