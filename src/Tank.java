@@ -556,7 +556,7 @@ class Tank extends Sprite {
         System.out.println("*** Tank["+ this.getId() + "].moveBy(PVector)");
 
         PVector newCoord = PVector.add(this.position, coord);
-        PVector nodevec = tp.getGrid.getNearestNodePosition(newCoord);
+        PVector nodevec = tp.getGrid().getNearestNodePosition(newCoord);
 
         moveTo(nodevec);
     }
@@ -744,7 +744,7 @@ class Tank extends Sprite {
             // Hitta koordinaten(PVector) i tankens riktning
             Sensor sens = getSensor("ULTRASONIC_FRONT");
             PVector sens_pos = (sens.readValue().obj().position);
-            PVector grid_pos = tp.getGrid.getNearestNodePosition(sens_pos);
+            PVector grid_pos = tp.getGrid().getNearestNodePosition(sens_pos);
             rotateTo(grid_pos); // call "rotateTo(PVector)"
         }
     }
