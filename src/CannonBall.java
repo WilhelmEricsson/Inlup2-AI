@@ -1,3 +1,7 @@
+import processing.core.PVector;
+
+import java.util.ArrayList;
+
 public class CannonBall extends Sprite {
     // Explosion
     ArrayList<Particle> particles;
@@ -24,15 +28,19 @@ public class CannonBall extends Sprite {
     // Size
     float r = 8;
 
-    color my_color;
+    int my_color;
 
     float topspeed = 10;
     int savedTime;
     int passedTime;
     boolean isCounting;
 
+    TankProg tp;
+
     //**************************************************
-    CannonBall() {
+    CannonBall(TankProg tp) {
+        this.tp = tp;
+
         //println("New CannonBall()");
 
         this.positionPrev = new PVector();
@@ -51,7 +59,7 @@ public class CannonBall extends Sprite {
     }
 
     //**************************************************
-    void setColor(color c) {
+    void setColor(int c) {
         this.my_color = c;
     }
 
@@ -64,11 +72,6 @@ public class CannonBall extends Sprite {
     //String getName(){
     //  return this.name;
     //}
-
-    //**************************************************
-    PVector position() {
-        return this.position;
-    }
 
     //**************************************************
     // Called by tank object.
@@ -85,7 +88,7 @@ public class CannonBall extends Sprite {
     //**************************************************
     // Called by tank object.
     void loaded() {
-        println("*** CannonBall.loaded()");
+        System.out.println("*** CannonBall.loaded()");
         this.isLoaded = true;
     }
 
@@ -99,7 +102,7 @@ public class CannonBall extends Sprite {
     void startTimer() {
         //println("*** CannonBall.startTimer()");
         this.isCounting = true;
-        this.savedTime = millis();
+        this.savedTime = tp.millis();
         this.passedTime = 0;
 
     }
@@ -126,9 +129,9 @@ public class CannonBall extends Sprite {
 
 
         this.particles = new ArrayList<Particle>();
-        this.particles.add(new Particle(new PVector(0,0)));
-        this.particles.add(new Particle(new PVector(0,0)));
-        this.particles.add(new Particle(new PVector(0,0)));
+        this.particles.add(new Particle(new PVector(0,0)), tp);
+        this.particles.add(new Particle(new PVector(0,0)), tp);
+        this.particles.add(new Particle(new PVector(0,0)), tp);
     }
 
     //**************************************************
@@ -144,7 +147,7 @@ public class CannonBall extends Sprite {
         }
 
         if (isCounting) {
-            this.passedTime = millis() - this.savedTime;
+            this.passedTime = tp.millis() - this.savedTime;
         }
     }
 
@@ -169,7 +172,7 @@ public class CannonBall extends Sprite {
             float minDistance = this.radius + other.radius;
 
             if (distanceVectMag <= minDistance) {
-                println("collision Tree");
+                System.out.println("collision Tree");
                 this.position.set(this.positionPrev); // Flytta tillbaka.
                 //this.acceleration.set(0,0,0);
                 //this.velocity.set(0,0,0);
@@ -195,7 +198,7 @@ public class CannonBall extends Sprite {
             float minDistance = this.radius + other.radius;
 
             if (distanceVectMag < minDistance) {
-                println("CannonBall collision Tank");
+                System.out.println("CannonBall collision Tank");
                 this.position.set(this.positionPrev); // Flytta tillbaka.
                 //this.acceleration.set(0,0,0);
                 //this.velocity.set(0,0,0);
@@ -213,13 +216,13 @@ public class CannonBall extends Sprite {
 
     //**************************************************
     void display() {
-        imageMode(CENTER);
-        stroke(0);
-        strokeWeight(2);
-        fill(this.my_color);
+        tp.imageMode(tp.CENTER);
+        tp.stroke(0);
+        tp.strokeWeight(2);
+        tp.fill(this.my_color);
 
-        pushMatrix();
-        translate(this.position.x,this.position.y);
+        tp.pushMatrix();
+        tp.translate(this.position.x,this.position.y);
 
         if (this.isExploding) {
             for(int i=0; i < this.particles.size(); i++){
@@ -231,14 +234,14 @@ public class CannonBall extends Sprite {
         }
         else {
             if (!(this.isCounting && !this.isInMotion) && this.isVisible) {
-                ellipse(0, 0, this.r*2, this.r*2);
+                tp.ellipse(0, 0, this.r*2, this.r*2);
             }
         }
-        popMatrix();
+        tp.popMatrix();
 
         // Nedan är bara en nödlösning för att återställa vissa varabler som ändrats i particles.
-        fill(this.my_color);
-        stroke(0);
-        strokeWeight(1);
+        tp.fill(this.my_color);
+        tp.stroke(0);
+        tp.strokeWeight(1);
     }
 }
