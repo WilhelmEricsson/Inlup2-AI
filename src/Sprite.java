@@ -1,3 +1,5 @@
+import processing.core.PVector;
+
 public class Sprite {
 
     PVector position;
