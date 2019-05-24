@@ -63,6 +63,7 @@
         int startTime = 1; //minutes
         int remainingTime;
 
+        @Override
         public void setup() {
             size(800, 800);
         /* LJUD!
@@ -71,7 +72,7 @@
         soundManager.addSound("tank_idle");
         soundManager.addSound("blast");*/
 
-            grid = new Grid(cols, rows, grid_size);
+            grid = new Grid(cols, rows, grid_size, this);
 
             //grid = new Node[cols][rows];
             //for (int i = 0; i < cols; i++) {
@@ -83,9 +84,9 @@
 
 
             // Skapa alla träd
-            allTrees[0] = new Tree(230, 600);
-            allTrees[1] = new Tree(280, 230);//280,230(300,300)
-            allTrees[2] = new Tree(530, 520);//530, 520(500,500);
+            allTrees[0] = new Tree(230, 600, this);
+            allTrees[1] = new Tree(280, 230, this);//280,230(300,300)
+            allTrees[2] = new Tree(530, 520, this);//530, 520(500,500);
 
             // Skapa alla skott
             for (int i = 0; i < allShots.length; i++) {
@@ -107,7 +108,7 @@
             teams[0] = new Team1(0, tank_size, team0Color,
                     team0_tank0_startpos, 0, allShots[0],
                     team0_tank1_startpos, 1, allShots[1],
-                    team0_tank2_startpos, 2, allShots[2]);
+                    team0_tank2_startpos, 2, allShots[2], this);
 
             allTanks[0] = teams[0].tanks[0];
             allTanks[1] = teams[0].tanks[1];
@@ -116,13 +117,13 @@
             teams[1] = new Team2(1, tank_size, team1Color,
                     team1_tank0_startpos, 3, allShots[3],
                     team1_tank1_startpos, 4, allShots[4],
-                    team1_tank2_startpos, 5, allShots[5]);
+                    team1_tank2_startpos, 5, allShots[5], this);
 
             allTanks[3] = teams[1].tanks[0];
             allTanks[4] = teams[1].tanks[1];
             allTanks[5] = teams[1].tanks[2];
 
-            loadShots();
+            Util.loadShots();
             userControl = false;
             tankInFocus = 0;
 
@@ -133,17 +134,16 @@
             timer.setDirection("down");
             timer.setTime(startTime);
         }
-
-
-        void draw() {
+        @Override
+        public void draw() {
             background(200);
-            checkForInput(); // Kontrollera inmatning.
+            Util.checkForInput(); // Kontrollera inmatning.
 
             if (!gameOver && !pause) {
                 // timer används inte i dagsläget.
                 timer.tick(); // Alt.1
                 float deltaTime = timer.getDeltaSec();
-                remainingTime = int(timer.getTotalTime());
+                remainingTime = (int)timer.getTotalTime();
                 if (remainingTime <= 0) {
                     remainingTime = 0;
                     timer.pause();
@@ -158,28 +158,28 @@
                 }
 
                 // UPDATE LOGIC
-                updateTanksLogic();
-                updateTeamsLogic();
+                Util.updateTanksLogic();
+                Util.updateTeamsLogic();
 
                 // UPDATE TANKS
-                updateTanks();
-                updateShots();
+                Util.updateTanks();
+                Util.updateShots();
 
                 // CHECK FOR COLLISIONS
-                checkForCollisionsShots();
-                checkForCollisionsTanks();
+                Util.checkForCollisionsShots();
+                Util.checkForCollisionsTanks();
 
             }
 
             // UPDATE DISPLAY
             teams[0].displayHomeBase();
             teams[1].displayHomeBase();
-            displayTrees();
-            updateTanksDisplay();
-            updateShotsDisplay();
+            Util.displayTrees();
+            Util.updateTanksDisplay();
+            Util.updateShotsDisplay();
 
 
-            showGUI();
+            Util.showGUI();
 
         }
 
