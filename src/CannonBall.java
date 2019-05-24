@@ -129,6 +129,7 @@ public class CannonBall extends Sprite {
 
 
         this.particles = new ArrayList<Particle>();
+        //??
         this.particles.add(new Particle(new PVector(0,0)), tp);
         this.particles.add(new Particle(new PVector(0,0)), tp);
         this.particles.add(new Particle(new PVector(0,0)), tp);
