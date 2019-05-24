@@ -11,17 +11,20 @@ public class SensorCompass extends Sensor{
 
     float[] values = new float[1];
 
+    TankProg tp;
+
     //SensorCompass(GameSimulator g, Tank t){
     //  super(g, t);
     //}
-    SensorCompass(Tank t){
+    SensorCompass(Tank t, TankProg tp){
         super(t);
+        this.tp = tp;
     }
 
     float lastRead = 0;
     public float[] readValues(){
         //if(game.getTime() >= lastRead + READ_INTERVAL)
-        if(getTime() >= lastRead + READ_INTERVAL)
+        if(tp.getTime() >= lastRead + READ_INTERVAL)
             doReading();
 
         return values;
@@ -38,7 +41,7 @@ public class SensorCompass extends Sensor{
         int multiples = (int)(orientation / 360);
         orientation = orientation - multiples * 360;
         //orientation = MathUtil.fixAngle(orientation);
-        orientation = fixAngle(orientation);
+        orientation = Util.fixAngle(orientation);
 
         values[0] = getReadingAfterNoise(orientation, NOISE_AMOUNT);
     }

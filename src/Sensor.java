@@ -1,4 +1,4 @@
-public class SensorReading {
+class SensorReading {
     float distance;
     float heading;
     Sprite obj;
