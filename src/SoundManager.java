@@ -3,6 +3,7 @@
     access to Minim so we have an equivalent class, SoundManager.js
     that handles audio.
 */
+/*
 public class SoundManager{
     boolean muted = false;
     Minim minim;
@@ -10,9 +11,7 @@ public class SoundManager{
     ArrayList <PlayerQueue> queuedSounds;
     ArrayList <String> queuedSoundNames;
 
-    /*
-        Handles the issue where we want to play multiple audio streams from the same clip.
-    */
+
     private class PlayerQueue{
         private ArrayList <AudioPlayer> players;
         private String path;
@@ -65,8 +64,7 @@ public class SoundManager{
         }
     }
 
-    /*
-     */
+
     public SoundManager(PApplet applet){
         minim = new Minim(applet);
 
@@ -74,8 +72,7 @@ public class SoundManager{
         queuedSoundNames = new ArrayList<String>();
     }
 
-    /*
-     */
+
     public void setMute(boolean isMuted){
         muted = isMuted;
 
@@ -84,31 +81,19 @@ public class SoundManager{
         }
     }
 
-    /*
-     */
+
     public boolean isMuted(){
         return muted;
     }
 
-  /*private void play(AudioPlayer player){
-    if(muted || player.isPlaying()){
-      return;
-    }
 
-    player.play();
-    player.rewind();
-  }*/
-
-    /*
-     */
     public void addSound(String soundName){
         //queuedSounds.add(new PlayerQueue("audio/" + soundName + ".wav"));
         queuedSounds.add(new PlayerQueue("audio/" + soundName + ".mp3"));
         queuedSoundNames.add(soundName);
     }
 
-    /*
-     */
+
     public void playSound(String soundName){
         if(muted){
             return;
@@ -128,8 +113,7 @@ public class SoundManager{
         }
     }
 
-    /*
-     */
+
     public void stop(){
 
         for(int i = 0; i < queuedSounds.size(); i++){
@@ -138,5 +122,5 @@ public class SoundManager{
 
         minim.stop();
     }
-}
+}*/
 

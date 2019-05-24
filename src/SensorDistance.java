@@ -1,6 +1,8 @@
 // Används ännu inte.
 //import processing.core.*;
 
+import processing.core.PVector;
+
 /**
  * Simulates an ultrasonic distance sensor.
  * Readings are synchronous and blocking.
@@ -14,13 +16,16 @@ class SensorDistance extends Sensor{
     // Angle in degrees between tank's heading and sensor heading
     public float localOrientation = 0f;
 
+    TankProg tp;
+
     //SensorDistance(GameSimulator g, Tank r, float localOrientation) {
     //  super(g, r);
     //  this.localOrientation = localOrientation;
     //}
-    SensorDistance(Tank t, float localOrientation) {
+    SensorDistance(Tank t, float localOrientation, TankProg tp) {
         super(t);
         this.localOrientation = localOrientation;
+        this.tp = tp;
     }
 
     public boolean canSee(PVector obj) {
@@ -76,32 +81,32 @@ class SensorDistance extends Sensor{
         PVector t = new PVector();
         t = tank.position.copy();
         float angle = tank.heading; // - PI/2;
-        PVector force = new PVector(cos(angle),sin(angle));
+        PVector force = new PVector(tp.cos(angle),tp.sin(angle));
         force.mult(1000);
         t.add(force);
 
         v11 = new PVector(0, 0);          // vänster kant
-        v12 = new PVector(0, height);
+        v12 = new PVector(0, tp.height);
         h11 = new PVector(0, 0);          // övre kant
-        h12 = new PVector(width, 0);
-        v21 = new PVector(width, 0);      // höger kant
-        v22 = new PVector(width, height);
-        h21 = new PVector(0 , height);    // nerdre kant
-        h22 = new PVector(width, height);
+        h12 = new PVector(tp.width, 0);
+        v21 = new PVector(tp.width, 0);      // höger kant
+        v22 = new PVector(tp.width, tp.height);
+        h21 = new PVector(0 , tp.height);    // nerdre kant
+        h22 = new PVector(tp.width, tp.height);
 
 
         // Returnera koordinaten som PVector, där tankens heading korsar kanterna på fönstret.
         PVector pvec = new PVector();
 
-        pvec = line_line_p(tank.position, t, v21, v22); // höger kant.
+        pvec = Util.line_line_p(tank.position, t, v21, v22); // höger kant.
         if (pvec == null) {
-            pvec = line_line_p(tank.position, t, v11, v12); // vänster kant.
+            pvec = Util.line_line_p(tank.position, t, v11, v12); // vänster kant.
         }
         if (pvec == null) {
-            pvec = line_line_p(tank.position, t, h11, h12); // övre kant.
+            pvec = Util.line_line_p(tank.position, t, h11, h12); // övre kant.
         }
         if (pvec == null) {
-            pvec = line_line_p(tank.position, t, h21, h22); // nedre kant.
+            pvec = Util.line_line_p(tank.position, t, h21, h22); // nedre kant.
         }
 
         return pvec;
@@ -117,33 +122,33 @@ class SensorDistance extends Sensor{
         tpos_cp = tank.position.copy();
         float angle = tank.heading; // - PI/2;
         PVector tpos = tank.position;
-        PVector force = new PVector(cos(angle),sin(angle));
+        PVector force = new PVector(tp.cos(angle),tp.sin(angle));
         force.mult(1000);
         tpos_cp.add(force);
 
         v11 = new PVector(0, 0);          // vänster kant
-        v12 = new PVector(0, height);
+        v12 = new PVector(0, tp.height);
         h11 = new PVector(0, 0);          // övre kant
-        h12 = new PVector(width, 0);
-        v21 = new PVector(width, 0);      // höger kant
-        v22 = new PVector(width, height);
-        h21 = new PVector(0 , height);    // nedre kant
-        h22 = new PVector(width, height);
+        h12 = new PVector(tp.width, 0);
+        v21 = new PVector(tp.width, 0);      // höger kant
+        v22 = new PVector(tp.width, tp.height);
+        h21 = new PVector(0 , tp.height);    // nedre kant
+        h22 = new PVector(tp.width, tp.height);
 
 
         // Returnera koordinaten som PVector, där tankens heading korsar kanterna på fönstret.
         PVector pvec = new PVector();
 
-        pvec = line_line_p(tpos, tpos_cp, v21, v22); // höger kant.
+        pvec = Util.line_line_p(tpos, tpos_cp, v21, v22); // höger kant.
 
         if (pvec == null) {
-            pvec = line_line_p(tpos, tpos_cp, v11, v12); // vänster kant.
+            pvec = Util.line_line_p(tpos, tpos_cp, v11, v12); // vänster kant.
         }
         if (pvec == null) {
-            pvec = line_line_p(tpos, tpos_cp, h11, h12); // övre kant.
+            pvec = Util.line_line_p(tpos, tpos_cp, h11, h12); // övre kant.
         }
         if (pvec == null) {
-            pvec = line_line_p(tpos, tpos_cp, h21, h22); // nedre kant.
+            pvec = Util.line_line_p(tpos, tpos_cp, h21, h22); // nedre kant.
         }
 
         // Om pvec fortfarande är null, så ge den ett värde.
@@ -194,7 +199,7 @@ class SensorDistance extends Sensor{
         //float dist = game.closestSimulatableInRay(tank, origin, direction);
 
         //dist = getReadingAfterNoise(dist, NOISE_AMOUNT);
-        float dist = 3.14; // Dummy temp.
+        float dist = 3.14f; // Dummy temp.
 
         float[] values = new float[1];
         values[0] = Math.max(dist, 0);

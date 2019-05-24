@@ -1,16 +1,21 @@
+import processing.core.PVector;
+
 public class Particle {
     PVector position;
     PVector velocity;
     PVector acceleration;
     float lifespan;
 
-    Particle(PVector l) {
+    TankProg tp;
+
+    Particle(PVector l, TankProg tp) {
+        this.tp = tp;
         this.acceleration = new PVector(0, 1);
         this.position = new PVector().set(l);
-        this.velocity = new PVector(random(-1, 1), random(-1, 1));
+        this.velocity = new PVector(tp.random(-1, 1), tp.random(-1, 1));
         //position = l.get();
 
-        lifespan = 255.0;
+        lifespan = 255.0f;
     }
 
     void run() {
@@ -22,16 +27,16 @@ public class Particle {
     void update() {
         //velocity.add(acceleration);
         position.add(velocity);
-        lifespan -= 7.0;
+        lifespan -= 7.0f;
     }
 
     // Method to display
     void display() {
         //println("lifespan: " + lifespan);
-        stroke(0, lifespan);
-        strokeWeight(2);
-        fill(127, lifespan);
-        ellipse(position.x, position.y, 100-lifespan, 100-lifespan);
+        tp.stroke(0, lifespan);
+        tp.strokeWeight(2);
+        tp.fill(127, lifespan);
+        tp.ellipse(position.x, position.y, 100-lifespan, 100-lifespan);
     }
 
     // Is the particle still useful?
