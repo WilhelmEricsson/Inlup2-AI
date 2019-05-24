@@ -12,6 +12,8 @@
     /* Ljud
     Minim minim;
     SoundManager soundManager;*/
+        //DETTA GÖRAS SNYGGARE
+        Util util = new Util(this);
 
         boolean debugOn = false;
         boolean pause = false;
@@ -63,13 +65,29 @@
         int startTime = 1; //minutes
         int remainingTime;
 
+
+        //-------------------------------------------MAIN-----------------------------------------------------------------
+
+        public static void main(String[] args){
+            PApplet.main("TankProg");
+        }
+
+
+
+
+        //----------------------------------------------------------------------------------------------------------------
+
         public Grid getGrid() {
             return grid;
+        }
+        @Override
+        public void settings(){
+            size(800, 800);
         }
 
         @Override
         public void setup() {
-            size(800, 800);
+
         /* LJUD!
         soundManager = new SoundManager(this);
         soundManager.addSound("tank_firing");
