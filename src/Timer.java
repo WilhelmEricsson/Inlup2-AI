@@ -9,7 +9,10 @@ public class Timer{
     private float totalTime;
     private boolean countingUp;
 
-    public Timer(){
+    TankProg tp;
+
+    public Timer(TankProg tp){
+        this.tp = tp;
         reset();
     }
 
@@ -70,11 +73,11 @@ public class Timer{
      */
     public void tick(){
         if(lastTime == -1){
-            lastTime = millis();
+            lastTime = tp.millis();
         }
 
-        int delta = millis() - lastTime;
-        lastTime = millis();
+        int delta = tp.millis() - lastTime;
+        lastTime = tp.millis();
         deltaTime = delta/1000f;
 
         if(countingUp){

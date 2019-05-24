@@ -138,15 +138,15 @@ class Tank extends Sprite {
         this.ball = ball;
         this.hasShot = false;
         this.maxspeed = 3; //3;
-        this.maxforce = 0.1;
+        this.maxforce = 0.1f;
         this.maxrotationspeed = radians(3);
         this.rotation_speed = 0;
-        this.image_scale = 0.5;
+        this.image_scale = 0.5f;
         this.isColliding = false;
 
 
         //this.img = loadImage("tankBody2.png");
-        this.turret = new Turret(this.diameter/2);
+        this.turret = new Turret(this.diameter/2, tp);
 
         this.radius = diameter/2;
 
@@ -236,7 +236,7 @@ class Tank extends Sprite {
     //**************************************************
     protected void initializeSensors() {
 
-        SensorDistance ultrasonic_front = new SensorDistance(this, 0f);
+        SensorDistance ultrasonic_front = new SensorDistance(this, 0f, tp);
         registerSensor(ultrasonic_front, "ULTRASONIC_FRONT");
 
         //SensorDistance ultrasonic_back = new SensorDistance(this, 180f);

@@ -1,3 +1,6 @@
+import processing.core.PImage;
+import processing.core.PVector;
+
 public class Turret {
     PImage img;
     float rotation_speed;
@@ -9,14 +12,15 @@ public class Turret {
     // Variable for heading!
     float heading;
 
+    TankProg tp;
 
-    Turret(float cannon_length) {
+    Turret(float cannon_length, TankProg tp) {
         //this.img = loadImage("gunTurret2.png");
-        this.position = new PVector(0.0, 0.0);
-
+        this.position = new PVector(0, 0);
+        this.tp = tp;
         this.cannon_length = cannon_length;
-        this.heading = 0.0;
-        this.rotation_speed = radians(1);
+        this.heading = 0.0f;
+        this.rotation_speed = tp.radians(1);
     }
 
     void turnLeft() {
@@ -28,11 +32,11 @@ public class Turret {
     }
 
     void drawTurret(){
-        strokeWeight(1);
+        tp.strokeWeight(1);
         //fill(204, 50, 50);
-        ellipse(0, 0, 25, 25);
-        strokeWeight(3);
-        line(0, 0, this.cannon_length, 0);
+        tp.ellipse(0, 0, 25, 25);
+        tp.strokeWeight(3);
+        tp.line(0, 0, this.cannon_length, 0);
     }
 
     void fire() {
@@ -40,10 +44,10 @@ public class Turret {
     }
 
     void display() {
-        this.position.x = cos(this.heading);
-        this.position.y = sin(this.heading);
+        this.position.x = tp.cos(this.heading);
+        this.position.y = tp.sin(this.heading);
 
-        rotate(this.heading);
+        tp.rotate(this.heading);
         //image(img, 20, 0);
         drawTurret();
 
