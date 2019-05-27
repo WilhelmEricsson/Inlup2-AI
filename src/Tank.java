@@ -91,6 +91,8 @@ class Tank extends Sprite {
 
     protected ArrayList<Sensor> mySensors = new ArrayList<Sensor>();
 
+
+    private SensorReading latestSensor = null;
     private TankProg tp;
 
     //**************************************************
@@ -241,6 +243,9 @@ class Tank extends Sprite {
 
         SensorDistance ultrasonic_front = new SensorDistance(this, 0f, tp);
         registerSensor(ultrasonic_front, "ULTRASONIC_FRONT");
+
+        SightSensor sightSensor = new SightSensor(this, tp);
+        registerSensor(sightSensor, "SIGHT_SENSOR");
 
         //SensorDistance ultrasonic_back = new SensorDistance(this, 180f);
         //registerSensor(ultrasonic_back, "ULTRASONIC_BACK");
@@ -1029,8 +1034,27 @@ class Tank extends Sprite {
         //println("Tank.COLLISION");
     }
 
+    public void checkSensor(PVector pos) {
+        SightSensor sens = (SightSensor) getSensor("SIGHT_SENSOR");
+        latestSensor = sens.readValue(pos);
+
+        Sprite test2 = latestSensor.obj;
+        if (test2 != null) {
+            tp.pushMatrix();
+            tp.fill(255, 255, 0);
+            tp.ellipse(test2.position.x, test2.position.y, 100, 100);
+            tp.popMatrix();
+        }
+
+    }
+
     //**************************************************
     void checkCollision(Tree other) {
+
+
+        // check sensor collision
+        checkSensor(other.position);
+
         //println("*** Tank.checkCollision(Tree)");
         // Check for collisions with "no Smart Objects", Obstacles (trees, etc.)
 
@@ -1074,6 +1098,10 @@ class Tank extends Sprite {
     // Called from environment
     // Keeps an array with vectors to the other tanks, so the tank object can access the other tanks when called for.
     void checkCollision(Tank other) {
+
+        // check sensor collision
+        checkSensor(other.position);
+
         //println("*** Tank.checkCollision(Tank)");
         // Check for collisions with "Smart Objects", other Tanks.
 
@@ -1185,6 +1213,14 @@ class Tank extends Sprite {
 
     //**************************************************
     final void display() {
+        // ritar ut prick från ultrasonic front sensor
+        if (id == 0) {
+            PVector temp = readSensor_distance(getSensor("ULTRASONIC_FRONT")).obj.position;
+            tp.pushMatrix();
+            tp.fill(200, 0, 0);
+            tp.ellipse(temp.x, temp.y, 10, 10);
+            tp.popMatrix();
+        }
 
         tp.imageMode(tp.CENTER);
         tp.pushMatrix();
