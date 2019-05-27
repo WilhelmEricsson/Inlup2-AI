@@ -1,5 +1,7 @@
 import processing.core.PVector;
 
+import java.util.Arrays;
+
 public class Tank4 extends Tank {
 
     boolean started;
@@ -31,24 +33,21 @@ public class Tank4 extends Tank {
 
     public void updateLogic() {
         super.updateLogic();
+    }
 
-        if (!started) {
-            started = true;
-            //moveTo(grid.getRandomNodePosition());
-            //moveForward_state();
+    @Override
+    public int calcUtil(){
+        return 0;
+    }
 
-            //if (!this.isMoving && moving20_120) {
-            //  this.moving20_120 = false;
-            moveBy(120, 20);
-            //moveTo(grid.getRandomNodePosition());
-            //}
-        }
-
-        if (!this.userControlled) {
-            //moveForward_state();
-            if (this.stop_state) {
-                //rotateTo()
+    private int argMax(float[] utility){
+        int max = 0;
+        for(int i = 1; i < utility.length; i++ ){
+            if(utility[max] < utility[i]){
+                max = i;
             }
         }
+        System.err.println("TANK_ID: " + id + " util: " + utility[max] + " arg: " + max);
+        return max;
     }
 }

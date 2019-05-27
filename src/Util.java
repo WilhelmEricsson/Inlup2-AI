@@ -1,13 +1,16 @@
 
 import processing.core.*;
 
+import java.util.Random;
+
 
 public class Util {
     private static TankProg tp;
-
+    private static Random rndGen;
 
     public Util(TankProg tp){
         this.tp = tp;
+        rndGen = new Random();
     }
 
     // call to Team updateLogic()
@@ -235,142 +238,7 @@ public class Util {
         }
     }
 
-    public static void keyPressed() {
-        if (tp.userControl) {
 
-            if (tp.key == tp.CODED) {
-                switch (tp.keyCode) {
-                    case PApplet.LEFT:
-                        //myTank1_snd.engineStart();
-                        tp.left = true;
-                        break;
-                    case PApplet.RIGHT:
-                        //myTank_snd.engineStart();
-                        tp.right = true;
-                        break;
-                    case PApplet.UP:
-                        //myTank_snd.engineStart();
-                        tp.up = true;
-                        break;
-                    case PApplet.DOWN:
-                        //myTank_snd.engineStart();
-                        tp.down = true;
-                        break;
-                    case PApplet.ALT:
-                        // turret.
-                        tp.alt_key = true;
-                        break;
-                }
-            }
-            if (tp.key == ' ') {
-                //myAudio.shot();
-                //myAudio.blast();
-                //myTank1.fire();
-                System.out.println("keyPressed SPACE");
-                tp.allTanks[tp.tankInFocus].fire();
-            }
-        }
-
-        if (tp.key == 'c') {
-            tp.userControl = !tp.userControl;
-
-//    allTanks[tankInFocus].stopMoving_state();
-//    allTanks[tankInFocus].stopTurning_state();
-//    allTanks[tankInFocus].stopTurretTurning_state();
-
-            if (!tp.userControl) {
-                tp.allTanks[tp.tankInFocus].releaseControl();
-
-            } else {
-                tp.allTanks[tp.tankInFocus].takeControl();
-            }
-        }
-
-        if (tp.key == 'p') {
-            tp.pause = !tp.pause;
-            if (tp.pause) {
-                tp.timer.pause();
-            } else {
-                tp.timer.resume();
-            }
-        }
-
-        if (tp.key == 'd') {
-            tp.debugOn = !tp.debugOn;
-        }
-    }
-
-    public static void keyReleased() {
-        if (tp.userControl) {
-
-            if (tp.key == tp.CODED) {
-                switch (tp.keyCode) {
-                    case PApplet.LEFT:
-                        //myTank_snd.engineStop();
-                        tp.left = false;
-                        tp.allTanks[tp.tankInFocus].stopTurning_state();
-                        break;
-                    case PApplet.RIGHT:
-                        //myTank_snd.engineStop();
-                        tp.right = false;
-                        tp.allTanks[tp.tankInFocus].stopTurning_state();
-                        break;
-                    case PApplet.UP:
-                        //myTank_snd.engineStop();
-                        tp.up = false;
-                        tp.allTanks[tp.tankInFocus].stopMoving_state();
-                        break;
-                    case PApplet.DOWN:
-                        //myTank_snd.engineStop();
-                        tp.down = false;
-                        tp.allTanks[tp.tankInFocus].stopMoving_state();
-                        break;
-                    case PApplet.ALT:
-                        // turret.
-                        tp.alt_key = false;
-                        tp.allTanks[tp.tankInFocus].stopTurretTurning_state();
-                }
-            }
-        }
-    }
-
-    public static void keyTyped() {
-
-        if (tp.userControl) {
-            switch (tp.key) {
-                case '1':
-                    tp.allTanks[tp.tankInFocus].releaseControl();
-                    tp.tankInFocus = 1;
-                    tp.allTanks[tp.tankInFocus].takeControl();
-                    break;
-                case '2':
-                    tp.allTanks[tp.tankInFocus].releaseControl();
-                    tp.tankInFocus = 2;
-                    tp.allTanks[tp.tankInFocus].takeControl();
-                    break;
-                case '3':
-                    tp.allTanks[tp.tankInFocus].releaseControl();
-                    tp.tankInFocus = 3;
-                    tp.allTanks[tp.tankInFocus].takeControl();
-                    break;
-                case '4':
-                    tp.allTanks[tp.tankInFocus].releaseControl();
-                    tp.tankInFocus = 4;
-                    tp.allTanks[tp.tankInFocus].takeControl();
-                    break;
-                case '5':
-                    tp.allTanks[tp.tankInFocus].releaseControl();
-                    tp.tankInFocus = 5;
-                    tp.allTanks[tp.tankInFocus].takeControl();
-                    break;
-                case '0':
-                    tp.allTanks[tp.tankInFocus].releaseControl();
-                    tp.tankInFocus = 0;
-                    tp.allTanks[tp.tankInFocus].takeControl();
-                    break;
-            }
-        }
-    }
 
 
     // Initiera användargränssnittet.
@@ -466,5 +334,10 @@ public class Util {
             tp.allShots[i].display();
         }
     }
+
+    public static int getRndDecision(){
+        return rndGen.nextInt(8);
+    }
+
 
 }

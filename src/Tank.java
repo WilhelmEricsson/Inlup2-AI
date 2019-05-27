@@ -3,11 +3,14 @@ import processing.core.PVector;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Random;
 
 import static processing.core.PApplet.radians;
+import static processing.core.PApplet.saveStream;
 
 class Tank extends Sprite {
     int id;
+    float stepDist = 100;
     //String name; //Sprite
     int team_id;
 
@@ -271,25 +274,26 @@ class Tank extends Sprite {
     }
 
     //**************************************************
-    void readSensors() {
-    /*
-     println("*** Tank[" + team.getId()+"].readSensors()");
-     println("sensors: " + sensors);
+    void readSensors() {/*
+        System.out.println("*** Tank[" + team.getId() + "].readSensors()");
+        System.out.println("sensors: " + sensors);
 
-     for (Sensor s : mySensors) {
-     if (s.tank == this) {
-     PVector sens = (s.readValue().obj().position);
+        for (Sensor s : mySensors) {
+            if (s.tank == this) {
+                PVector sens = (s.readValue().obj().position);
 
-     //println("============");
-     //println("("+sens.x + " , "+sens.y+")");
-     //ellipse(sens.x, sens.y, 10,10);
-     if (sens != null) {
-     line(this.position.x,this.position.y, sens.x, sens.y);
-     println("Tank" + this.team.getId() + ":"+this.id + " ( " + sens.x + ", "+ sens.y + " )");
+                //println("============");
+                //println("("+sens.x + " , "+sens.y+")");
+                tp.ellipse(sens.x, sens.y, 10,10);
+                if (sens != null) {
+                    tp.line(this.position.x, this.position.y, sens.x, sens.y);
+                    System.out.println("Tank" + this.team.getId() + ":" + this.id + " ( " + sens.x + ", " + sens.y + " )");
 
-     }
-     }
-     */
+                }
+            }
+
+        }
+        */
     }
 
     //**************************************************
@@ -651,13 +655,10 @@ class Tank extends Sprite {
         this.backward_state = false;
         this.forward_state = false;
 
-        this.backward_state = false;
-        this.forward_state = false;
         this.turning_right_state = false;
         this.turning_left_state = false;
         this.turning_turret_right_state = false;
         this.turning_turret_left_state = false;
-        this.stop_state = true;
         this.stop_turning_state = true;
         this.stop_turret_turning_state = true;
 
@@ -828,7 +829,54 @@ class Tank extends Sprite {
     //**************************************************
     // Är tänkt att överskuggas (override) i subklassen.
     void updateLogic() {
+        if(!isDestroyed && !isMoving && idle_state){
+            chooseAction();
+        }
+
     }
+
+    public void chooseAction(){
+        int cmd = calcUtil();
+        switch (cmd){
+            case 0: //N
+                moveTo(new PVector(this.position.x, this.position.y-stepDist));
+                isMoving = true;
+                break;
+            case 1: //NE
+                moveTo(new PVector(this.position.x+stepDist, this.position.y-stepDist));
+                isMoving = true;
+                break;
+            case 2://E
+                moveTo(new PVector(this.position.x+stepDist, this.position.y));
+                isMoving = true;
+                break;
+            case 3://SE
+                moveTo(new PVector(this.position.x+stepDist, this.position.y+stepDist));
+                isMoving = true;
+                break;
+            case 4://S
+                moveTo(new PVector(this.position.x, this.position.y+stepDist));
+                isMoving = true;
+                break;
+            case 5://SW
+                moveTo(new PVector(this.position.x-stepDist, this.position.y+stepDist));
+                isMoving = true;
+                break;
+            case 6://W
+                moveTo(new PVector(this.position.x-stepDist, this.position.y));
+                isMoving = true;
+                break;
+            case 7://NW
+                moveTo(new PVector(this.position.x-stepDist, this.position.y-stepDist));
+                isMoving = true;
+                break;
+        }
+    }
+    public int calcUtil(){
+        return Util.getRndDecision();
+    }
+
+
 
     //**************************************************
     // Called from game
@@ -1068,6 +1116,24 @@ class Tank extends Sprite {
         }
     }
 
+    public PVector checkPotentialCollision(Sprite other, PVector potentialPosition){
+
+        // Get distances between the tanks components
+        PVector distanceVect = PVector.sub(other.position, potentialPosition);
+
+        // Calculate magnitude of the vector separating the tanks
+        float distanceVectMag = distanceVect.mag();
+
+        // Minimum distance before they are touching
+        float minDistance = this.radius + other.radius;
+
+        if (distanceVectMag <= minDistance) {
+            return null;
+        }
+
+
+        return potentialPosition;
+    }
     void setNode() {
         //setTargetPosition(this.position);
     }
@@ -1101,7 +1167,7 @@ class Tank extends Sprite {
     //**************************************************
     void drawTank(float x, float y) {
         tp.fill(this.team.getColor());
-
+        //tp.rect(x-100, y-100, 200, 200);
         if (this.team.getId() == 0) tp.fill((((255/6) * this.health) *40 ), 50* this.health, 50* this.health, 255 - this.health*60);
         if (this.team.getId() == 1) tp.fill(10*this.health, (255/6) * this.health, (((255/6) * this.health) * 3), 255 - this.health*60);
 

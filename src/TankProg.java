@@ -214,7 +214,7 @@
         float getTime() {
             return 0; //Dummy temp
         }
-
+        @Override
         public void keyPressed() {
             if (userControl) {
 
@@ -279,7 +279,7 @@
                 debugOn = !debugOn;
             }
         }
-
+        @Override
         public void keyReleased() {
             if (userControl) {
 
@@ -313,7 +313,7 @@
                 }
             }
         }
-
+        @Override
         public void keyTyped() {
 
             if (userControl) {
