@@ -1036,8 +1036,8 @@ class Tank extends Sprite {
 
     // Send message to all other Tanks in Team
     // Send message to all other Tanks in Team
-    protected void sendMessageToTeam(String message) {
-        team.addMessage(new TankMessage(id, message));
+    protected void sendMessageToTeam(String message, PVector position) {
+        team.addMessage(new TankMessage(id, message, position));
     }
 
     // Called by team when someone sends a message
@@ -1066,7 +1066,18 @@ class Tank extends Sprite {
         if (latestSensorReading.obj == null) {
             return false;
         }
+
+        drawSightSensor();
+
         return true;
+    }
+
+    private void drawSightSensor() {
+        SightSensor sens = (SightSensor) getSensor("SIGHT_SENSOR");
+        tp.pushMatrix();
+        tp.fill(255,255,0);
+        tp.ellipse(sens.getIntersectPoint().x, sens.getIntersectPoint().y, 50, 50);
+        tp.popMatrix();
     }
 
     //**************************************************
