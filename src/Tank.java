@@ -92,7 +92,8 @@ class Tank extends Sprite {
     protected ArrayList<Sensor> mySensors = new ArrayList<Sensor>();
 
 
-    private SensorReading latestSensor = null;
+    private SensorReading latestSensorReading = null;
+    protected boolean messageReceived = false;
     private TankProg tp;
 
     //**************************************************
@@ -166,7 +167,6 @@ class Tank extends Sprite {
 
         this.ball.setColor(this.team.getColor());
         this.ball.setOwner(this);
-
 
         initializeSensors();
     }
@@ -244,7 +244,7 @@ class Tank extends Sprite {
         SensorDistance ultrasonic_front = new SensorDistance(this, 0f, tp);
         registerSensor(ultrasonic_front, "ULTRASONIC_FRONT");
 
-        SightSensor sightSensor = new SightSensor(this, tp);
+        SightSensor sightSensor = new SightSensor(this);
         registerSensor(sightSensor, "SIGHT_SENSOR");
 
         //SensorDistance ultrasonic_back = new SensorDistance(this, 180f);
@@ -1034,27 +1034,43 @@ class Tank extends Sprite {
         //println("Tank.COLLISION");
     }
 
-    public void checkSensor(PVector pos) {
-        SightSensor sens = (SightSensor) getSensor("SIGHT_SENSOR");
-        latestSensor = sens.readValue(pos);
+    // Send message to all other Tanks in Team
+    // Send message to all other Tanks in Team
+    protected void sendMessageToTeam(String message) {
+        team.addMessage(new TankMessage(id, message));
+    }
 
-        Sprite test2 = latestSensor.obj;
-        if (test2 != null) {
-            tp.pushMatrix();
-            tp.fill(255, 255, 0);
-            tp.ellipse(test2.position.x, test2.position.y, 100, 100);
-            tp.popMatrix();
+    // Called by team when someone sends a message
+    // Tanks should check every frame if messageReceived is true,
+    // if it is they should use the getMessageRecieved method and deal with it accordingly
+    protected void receiveMessageFromTeam(TankMessage message) {
+        messageReceived = true;
+    }
+
+    // Returns the latest message from the list of messages in Team
+    protected TankMessage getMessageReceived() {
+        messageReceived = false;
+        return team.getLatestMessage();
+    }
+
+    // Reads sensor value for of SightSensor given the sprite, returns true if it was in the tanks field of view
+    protected Boolean readSightSensor(Sprite sprite) {
+        SightSensor sens = (SightSensor) getSensor("SIGHT_SENSOR");
+
+        if (sprite instanceof Tree) {
+            latestSensorReading = sens.readValue(sprite, 50);
+        } else {
+            latestSensorReading = sens.readValue(sprite, 25);
         }
 
+        if (latestSensorReading.obj == null) {
+            return false;
+        }
+        return true;
     }
 
     //**************************************************
     void checkCollision(Tree other) {
-
-
-        // check sensor collision
-        checkSensor(other.position);
-
         //println("*** Tank.checkCollision(Tree)");
         // Check for collisions with "no Smart Objects", Obstacles (trees, etc.)
 
@@ -1098,10 +1114,6 @@ class Tank extends Sprite {
     // Called from environment
     // Keeps an array with vectors to the other tanks, so the tank object can access the other tanks when called for.
     void checkCollision(Tank other) {
-
-        // check sensor collision
-        checkSensor(other.position);
-
         //println("*** Tank.checkCollision(Tank)");
         // Check for collisions with "Smart Objects", other Tanks.
 
@@ -1264,20 +1276,27 @@ class Tank extends Sprite {
 
             for (Sensor s : mySensors) {
                 if (s.tank == this) {
+                    //tp.pushMatrix();
                     // Rita ut vad sensorn ser (target och linje dit.)
                     tp.strokeWeight(1);
                     tp.stroke(0, 0, 255);
                     PVector sens = (s.readValue().obj().position);
+                    /*
+                    sens.sub(position);
+                    sens.normalize();
+                    sens.mult(200);
+                    */
 
                     //println("============");
                     //println("("+sens.x + " , "+sens.y+")");
                     //ellipse(sens.x, sens.y, 10,10);
-
+                    //tp.translate(position.x, position.y);
                     if ((sens != null && !this.isSpinning && !isImmobilized)) {
-                        tp.line(this.position.x, this.position.y, sens.x, sens.y);
+                        tp.line(position.x, position.y, sens.x, sens.y);
                         tp.ellipse(sens.x, sens.y, 10, 10);
                         //println("Tank" + this.team.getId() + ":"+this.id + " ( " + sens.x + ", "+ sens.y + " )");
                     }
+                    //tp.popMatrix();
                 }
             }
 
