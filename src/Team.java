@@ -1,5 +1,7 @@
 import processing.core.PVector;
 
+import java.util.LinkedList;
+
 class Team {
 
     Tank[] tanks = new Tank[3];
@@ -17,6 +19,8 @@ class Team {
     int team_color;
 
     int numberOfHits; // sammalagda antalet bekräftade träffar på andra lagets tanks.
+
+    private LinkedList<TankMessage> messages = new LinkedList<>();
 
     TankProg tp;
 
@@ -59,6 +63,19 @@ class Team {
 
     void updateLogic() {
 
+    }
+
+    public void addMessage(TankMessage message) {
+        messages.add(message);
+        for(Tank t: tanks) {
+            if (message.getSender() != t.getId()) {
+                t.receiveMessageFromTeam(message);
+            }
+        }
+    }
+
+    public TankMessage getLatestMessage() {
+        return messages.getFirst();
     }
 
 
