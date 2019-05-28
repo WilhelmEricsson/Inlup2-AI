@@ -1,24 +1,37 @@
 import processing.core.PVector;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.*;
 
 public class Tank4 extends Tank {
     private boolean enemyLocated;
     private boolean started;
-    private HashSet<Tree> obstacles;
+    private ArrayList<Tree> obstacles;
     private Tank enemyInfocus; // den tanken som ämnas bekämpas
     private HashMap<Tank, PVector> enemyLocatedAt;
 
     Tank4(int id, Team team, PVector startpos, float diameter, CannonBall ball, TankProg tp) {
         super(id, team, startpos, diameter, ball, tp);
-        obstacles = new HashSet<>();
+        obstacles = new ArrayList<>();
         enemyLocatedAt = new HashMap<>();
         enemyLocated = false;
         this.started = false;
     }
+
+    @Override
+    public void checkCollision(Tree other){
+        super.checkCollision(other);
+        if(readSightSensor(other)){
+
+            if(!obstacles.contains(other)){
+                obstacles.add(other);
+            }
+        }
+
+    }
+
+
+
+
 
     // Tanken meddelas om kollision med trädet.
     public void message_collision(Tree other) {
@@ -37,17 +50,18 @@ public class Tank4 extends Tank {
         //this.isMoving = false;
     }
 
+    @Override
     public void updateLogic() {
         if(enemyLocated){
             battleState();
         }else{
-            if(idle_state) {
+            if(!isMoving) {
                 searchState();
             }
         }
     }
 
-    //Random search, with preference to position located further away from home base/starting position
+    //SEARCH STATE -- Random search, with preference to position located further away from home base/starting position
     public void searchState(){
         PVector nextPosition = getNextPosition();
         moveTo(nextPosition);
@@ -79,18 +93,38 @@ public class Tank4 extends Tank {
         while(!validPosition){
             nextPosition = potentialPosition.get(Util.getRndDecision(potentialPosition.size()));
             //Detta måste fixas så att casten är säker.
-            if(!((Team1)getTeam()).isPosistionSearched(nextPosition) && !obstacles.contains(nextPosition)){
+            if(!((Team1)getTeam()).isPosistionSearched(nextPosition) && !isObstacle(nextPosition)){
                 break;
+            }else{
+                potentialPosition.remove(nextPosition);
             }
         }
 
         return nextPosition;
     }
-    public void battleState(){
-
+    private boolean isObstacle(PVector pos){
+        Iterator<Tree> obst = obstacles.iterator();
+        boolean isObst = false;
+        while(obst.hasNext()){
+            Tree temp = obst.next();
+            if((temp.position.x-temp.radius-this.radius) <= pos.x && (temp.position.x+temp.radius+this.radius)  >= pos.x){
+                if((temp.position.y-temp.radius-this.radius) <= pos.y && (temp.position.y+temp.radius+this.radius)  >= pos.y){
+                    isObst = true;
+                    break;
+                }
+            }
+        }
+        return isObst;
     }
 
 
+
+
+
+   //BATTLE STATE
+    public void battleState(){
+
+    }
     @Override
     public int calcUtil(){
         return 0;

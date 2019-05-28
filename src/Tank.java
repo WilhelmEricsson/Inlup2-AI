@@ -1081,7 +1081,7 @@ class Tank extends Sprite {
     }
 
     //**************************************************
-    void checkCollision(Tree other) {
+    public void checkCollision(Tree other) {
         //println("*** Tank.checkCollision(Tree)");
         // Check for collisions with "no Smart Objects", Obstacles (trees, etc.)
 
