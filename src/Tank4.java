@@ -12,6 +12,9 @@ public class Tank4 extends Tank {
     private Tank enemyInfocus; // den tanken som ämnas bekämpas
     private HashMap<Tank, PVector> enemyLocatedAt;
 
+
+    PVector nextPosition = new PVector(0,0);
+
     Tank4(int id, Team team, PVector startpos, float diameter, CannonBall ball, TankProg tp) {
         super(id, team, startpos, diameter, ball, tp);
         obstacles = new HashSet<>();
@@ -31,12 +34,20 @@ public class Tank4 extends Tank {
         super.arrived();
         System.out.println("*** Team"+this.team_id+".Tank["+ this.getId() + "].arrived()");
         ((Team1)getTeam()).addSearchedArea(this.position);
-        isMoving = false;
+        //isMoving = false;
         //moveTo(new PVector(int(random(width)),int(random(height))));
         //moveTo(grid.getRandomNodePosition());
         //this.isMoving = false;
     }
 
+    @Override
+    public void arrivedRotation() {
+        super.arrivedRotation();
+        moveTo(nextPosition);
+        //isMoving = true;
+    }
+
+    @Override
     public void updateLogic() {
         if(enemyLocated){
             battleState();
@@ -49,11 +60,8 @@ public class Tank4 extends Tank {
 
     //Random search, with preference to position located further away from home base/starting position
     public void searchState(){
-        PVector nextPosition = getNextPosition();
-        moveTo(nextPosition);
-        isMoving = true;
-
-
+        nextPosition = getNextPosition();
+        rotateTo(nextPosition);
     }
 
     private PVector getNextPosition(){
