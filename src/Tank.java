@@ -1036,8 +1036,8 @@ class Tank extends Sprite {
 
     // Send message to all other Tanks in Team
     // Send message to all other Tanks in Team
-    protected void sendMessageToTeam(String message) {
-        team.addMessage(new TankMessage(id, message));
+    protected void sendMessageToTeam(String message, PVector position) {
+        team.addMessage(new TankMessage(id, message, position));
     }
 
     // Called by team when someone sends a message
