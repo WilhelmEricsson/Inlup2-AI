@@ -16,7 +16,7 @@ public class Tree extends Sprite {
     //**************************************************
     Tree(int posx, int posy, TankProg tp) {
         this.tp = tp;
-        this.img = tp.loadImage("D:\\Users\\Wilhelm\\Inlup2-AI\\src\\resources\\data\\tree01_v2.png");
+        this.img = tp.loadImage("resources/data/tree01_v2.png");
         this.position = new PVector(posx, posy);
         //this.hitArea = new PVector(posx, posy); // Kanske inte kommer att användas.
         this.diameter = this.img.width/2;

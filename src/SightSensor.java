@@ -4,8 +4,14 @@ import static processing.core.PApplet.*;
 
 public class SightSensor extends Sensor {
 
+    PVector intersectPoint = null;
+
     SightSensor(Tank t) {
         super(t);
+    }
+
+    public PVector getIntersectPoint() {
+        return intersectPoint;
     }
 
     public SensorReading readValue(Sprite read, int radius){
@@ -26,10 +32,33 @@ public class SightSensor extends Sensor {
         float C = (checkPos.x * checkPos.x + (b - checkPos.y) * (b - checkPos.y)) - (radius * radius);
         float delta = B * B - 4 * A * C;
 
+        PVector pos1 = new PVector(0,0);
+        PVector pos2 = new PVector(0,0);
+        boolean posFound = false;
+
         if (delta >= 0) {
             float x1 = (-B - sqrt(delta)) / (2 * A);
             float y1 = a * x1 + b;
+
+            float x2 = (-B + sqrt(delta)) / (2 * A);
+            float y2 = a * x2 + b;
+
             if ((x1 > min(t.x, temp.x)) && (x1 < max(t.x, temp.x)) && (y1 > min(t.y, temp.y)) && (y1 < max(t.y, temp.y))) {
+                pos1 = new PVector(x1,y1);
+                posFound = true;
+            }
+            if ((x2 > min(t.x, temp.x)) && (x2 < max(t.x, temp.x)) && (y2 > min(t.y, temp.y)) && (y2 < max(t.y, temp.y))) {
+                pos2 = new PVector(x2,y2);
+                posFound = true;
+            }
+
+            if (t.dist(pos1) < t.dist(pos2)) {
+                intersectPoint = pos1;
+            } else {
+                intersectPoint = pos2;
+            }
+
+            if (posFound) {
                 sr = new SensorReading(read, PVector.dist(t, checkPos), 0F);
             }
         }

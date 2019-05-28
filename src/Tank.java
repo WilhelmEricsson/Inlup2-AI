@@ -1066,7 +1066,18 @@ class Tank extends Sprite {
         if (latestSensorReading.obj == null) {
             return false;
         }
+
+        drawSightSensor();
+
         return true;
+    }
+
+    private void drawSightSensor() {
+        SightSensor sens = (SightSensor) getSensor("SIGHT_SENSOR");
+        tp.pushMatrix();
+        tp.fill(255,255,0);
+        tp.ellipse(sens.getIntersectPoint().x, sens.getIntersectPoint().y, 50, 50);
+        tp.popMatrix();
     }
 
     //**************************************************
