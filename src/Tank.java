@@ -10,7 +10,7 @@ import static processing.core.PApplet.saveStream;
 
 class Tank extends Sprite {
     int id;
-    float stepDist = 100;
+    float stepDist = 200;
     //String name; //Sprite
     int team_id;
 
@@ -1298,4 +1298,8 @@ class Tank extends Sprite {
     public TankProg getTp(){
         return tp;
     }
+    public Team getTeam(){
+        return team;
+    }
+
 }

@@ -338,6 +338,9 @@ public class Util {
     public static int getRndDecision(){
         return rndGen.nextInt(8);
     }
+    public static int getRndDecision(int upperBound){
+        return rndGen.nextInt(upperBound);
+    }
 
 
 }
