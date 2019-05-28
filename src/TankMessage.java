@@ -14,6 +14,10 @@ public class TankMessage {
         this.message = message;
         this.position = position;
     }
+    public TankMessage(int sender, String message) {
+        this.sender = sender;
+        this.message = message;
+    }
 
     public String getMessage() {
         return message;
