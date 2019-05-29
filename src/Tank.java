@@ -1067,7 +1067,7 @@ class Tank extends Sprite {
             return false;
         }
 
-        drawSightSensor();
+        //drawSightSensor();
 
         return true;
     }
@@ -1082,6 +1082,8 @@ class Tank extends Sprite {
 
     //**************************************************
     public void checkCollision(Tree other) {
+
+        readSightSensor(other);
         //println("*** Tank.checkCollision(Tree)");
         // Check for collisions with "no Smart Objects", Obstacles (trees, etc.)
 
@@ -1125,6 +1127,10 @@ class Tank extends Sprite {
     // Called from environment
     // Keeps an array with vectors to the other tanks, so the tank object can access the other tanks when called for.
     void checkCollision(Tank other) {
+        if (other.id != this.id) {
+            readSightSensor(other);
+        }
+
         //println("*** Tank.checkCollision(Tank)");
         // Check for collisions with "Smart Objects", other Tanks.
 
