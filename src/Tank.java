@@ -398,7 +398,7 @@ class Tank extends Sprite {
     void turnTurretLeft_state() {
         if (this.stop_state) {
             if (!this.turning_turret_left_state) {
-                System.out.println("*** Tank[" + getId() + "].turnTurretLeft_state()");
+                //System.out.println("*** Tank[" + getId() + "].turnTurretLeft_state()");
                 this.turning_turret_right_state = false;
                 this.turning_turret_left_state = true;
                 this.stop_turret_turning_state = false;
@@ -418,7 +418,7 @@ class Tank extends Sprite {
     void turnTurretRight_state() {
         if (this.stop_state) {
             if (!this.turning_turret_right_state) {
-                System.out.println("*** Tank[" + getId() + "].turnTurretRight_state()");
+                //System.out.println("*** Tank[" + getId() + "].turnTurretRight_state()");
                 this.turning_turret_left_state = false;
                 this.turning_turret_right_state = true;
                 this.stop_turret_turning_state = false;
@@ -437,7 +437,7 @@ class Tank extends Sprite {
     // Det är denna metod som får tankens kanon att sluta rotera.
     void stopTurretTurning_state() {
         if (!this.stop_turret_turning_state) {
-            System.out.println("*** Tank[" + getId() + "].stopTurretTurning_state()");
+            //System.out.println("*** Tank[" + getId() + "].stopTurretTurning_state()");
             this.turning_turret_left_state = false;
             this.turning_turret_right_state = false;
             this.stop_turret_turning_state = true;
@@ -451,7 +451,7 @@ class Tank extends Sprite {
         this.turning_right_state = false;
 
         if (!this.turning_left_state) {
-            System.out.println("*** Tank[" + getId() + "].turnLeft_state()");
+            //System.out.println("*** Tank[" + getId() + "].turnLeft_state()");
             this.turning_left_state = true;
         }
     }
@@ -478,7 +478,7 @@ class Tank extends Sprite {
         this.turning_left_state = false;
 
         if (!this.turning_right_state) {
-            System.out.println("*** Tank[" + getId() + "].turnRight_state()");
+            //System.out.println("*** Tank[" + getId() + "].turnRight_state()");
             this.turning_right_state = true;
         }
     }
@@ -500,7 +500,7 @@ class Tank extends Sprite {
 
     //**************************************************
     void turnRight(PVector targetPos) {
-        System.out.println("*** Tank[" + getId() + "].turnRight(PVector)");
+        //System.out.println("*** Tank[" + getId() + "].turnRight(PVector)");
         PVector desired = PVector.sub(targetPos, position);  // A vector pointing from the position to the target
 
         desired.setMag(0);
@@ -512,7 +512,7 @@ class Tank extends Sprite {
 
     //**************************************************
     void stopTurning() {
-        System.out.println("*** Tank[" + getId()+"].stopTurning()");
+        //System.out.println("*** Tank[" + getId()+"].stopTurning()");
         this.rotation_speed = 0;
         arrivedRotation();
     }
@@ -521,18 +521,18 @@ class Tank extends Sprite {
     // Det är denna metod som får tanken att sluta svänga.
     void stopTurning_state() {
         if (!this.stop_turning_state) {
-            System.out.println("*** Tank[" + getId() + "].stopTurning_state()");
+            //System.out.println("*** Tank[" + getId() + "].stopTurning_state()");
             this.turning_left_state = false;
             this.turning_right_state = false;
             this.stop_turning_state = true;
 
-            System.out.println("! Tank[" + getId() + "].stopTurning_state() – stop_turning_state=true");
+            //System.out.println("! Tank[" + getId() + "].stopTurning_state() – stop_turning_state=true");
         }
     }
 
     //**************************************************
     void moveTo(float x, float y) {
-        System.out.println("*** Tank["+ this.getId() + "].moveTo(float x, float y)");
+        //System.out.println("*** Tank["+ this.getId() + "].moveTo(float x, float y)");
 
         moveTo(new PVector(x, y));
     }
@@ -541,7 +541,7 @@ class Tank extends Sprite {
     void moveTo(PVector coord) {
         //println("*** Tank["+ this.getId() + "].moveTo(PVector)");
         if (!isImmobilized) {
-            System.out.println("*** Tank["+ this.getId() + "].moveTo(PVector)");
+            //System.out.println("*** Tank["+ this.getId() + "].moveTo(PVector)");
 
             this.idle_state = false;
             this.isMoving = true;
@@ -554,14 +554,14 @@ class Tank extends Sprite {
 
     //**************************************************
     void moveBy(float x, float y) {
-        System.out.println("*** Tank["+ this.getId() + "].moveBy(float x, float y)");
+        //System.out.println("*** Tank["+ this.getId() + "].moveBy(float x, float y)");
 
         moveBy(new PVector(x, y));
     }
 
     //**************************************************
     void moveBy(PVector coord) {
-        System.out.println("*** Tank["+ this.getId() + "].moveBy(PVector)");
+        //System.out.println("*** Tank["+ this.getId() + "].moveBy(PVector)");
 
         PVector newCoord = PVector.add(this.position, coord);
         PVector nodevec = tp.getGrid().getNearestNodePosition(newCoord);
@@ -572,7 +572,7 @@ class Tank extends Sprite {
     //**************************************************
     // Det är denna metod som får tanken att gå framåt.
     void moveForward_state() {
-        System.out.println("*** Tank[" + getId() + "].moveForward_state()");
+        //System.out.println("*** Tank[" + getId() + "].moveForward_state()");
 
         if (!this.forward_state) {
             this.acceleration.set(0, 0, 0);
@@ -603,12 +603,12 @@ class Tank extends Sprite {
     //**************************************************
     // Det är denna metod som får tanken att gå bakåt.
     void moveBackward_state() {
-        System.out.println("*** Tank[" + getId() + "].moveBackward_state()");
+        //System.out.println("*** Tank[" + getId() + "].moveBackward_state()");
         this.stop_state = false;
         this.forward_state = false;
 
         if (!this.backward_state) {
-            System.out.println("! Tank[" + getId() + "].moveBackward_state() – (!this.backward_state)");
+            //System.out.println("! Tank[" + getId() + "].moveBackward_state() – (!this.backward_state)");
             this.acceleration.set(0, 0, 0);
             this.velocity.set(0, 0, 0);
             this.backward_state = true;
@@ -617,7 +617,7 @@ class Tank extends Sprite {
 
     //**************************************************
     void moveBackward() {
-        System.out.println("*** Tank[" + getId() + "].moveBackward()");
+        //System.out.println("*** Tank[" + getId() + "].moveBackward()");
         // Offset the angle since we drew the ship vertically
         float angle = this.heading - tp.PI; // - PI/2;
         // Polar to cartesian for force vector!
@@ -628,7 +628,7 @@ class Tank extends Sprite {
 
     //**************************************************
     void stopMoving() {
-        System.out.println("*** Tank[" + getId() + "].stopMoving()");
+        //System.out.println("*** Tank[" + getId() + "].stopMoving()");
 
         this.acceleration.set(0, 0, 0);
         this.velocity.set(0, 0, 0);
@@ -654,7 +654,7 @@ class Tank extends Sprite {
 
     //**************************************************
     void resetAllMovingStates() {
-        System.out.println("*** Tank[" + getId() + "].resetAllMovingStates()");
+        //System.out.println("*** Tank[" + getId() + "].resetAllMovingStates()");
         this.stop_state = true;
         this.backward_state = false;
         this.forward_state = false;
@@ -672,7 +672,7 @@ class Tank extends Sprite {
 
     //**************************************************
     void resetMovingStates() {
-        System.out.println("*** Tank[" + getId() + "].resetMovingStates()");
+        //System.out.println("*** Tank[" + getId() + "].resetMovingStates()");
         this.stop_state = true;
         this.backward_state = false;
         this.forward_state = false;
@@ -680,7 +680,7 @@ class Tank extends Sprite {
 
     //**************************************************
     void resetTargetStates() {
-        System.out.println("*** Tank[" + getId() + "].resetTargetStates()");
+        //System.out.println("*** Tank[" + getId() + "].resetTargetStates()");
         this.targetPosition = new PVector(this.position.x, this.position.y);
 
         this.targetHeading = this.heading; // Tanks har alltid en heading mot ett target.
@@ -740,7 +740,7 @@ class Tank extends Sprite {
     //**************************************************
 
     void rotateTo(float angle) {
-        System.out.println("*** Tank["+ this.getId() + "].rotateTo(float): "+angle);
+        //System.out.println("*** Tank["+ this.getId() + "].rotateTo(float): "+angle);
 
         if (!isImmobilized) {
 
@@ -757,7 +757,7 @@ class Tank extends Sprite {
     //**************************************************
 
     void rotateTo(PVector coord) {
-        System.out.println("*** Tank["+ this.getId() + "].rotateTo(PVector) – ["+(int)coord.x+","+(int)coord.y+"]");
+        //System.out.println("*** Tank["+ this.getId() + "].rotateTo(PVector) – ["+(int)coord.x+","+(int)coord.y+"]");
 
         if (!isImmobilized) {
 
@@ -818,14 +818,14 @@ class Tank extends Sprite {
     //**************************************************
     // Tanken meddelas om kollision med trädet.
     void arrivedRotation() {
-        System.out.println("*** Tank["+ this.getId() + "].arrivedRotation()");
+        //System.out.println("*** Tank["+ this.getId() + "].arrivedRotation()");
         stopTurning_state();
         this.isMoving = false;
     }
 
     //**************************************************
     void arrived() {
-        System.out.println("*** Tank["+ this.getId() + "].arrived()");
+        //System.out.println("*** Tank["+ this.getId() + "].arrived()");
         this.isMoving = false;
         stopMoving_state();
     }
@@ -935,7 +935,7 @@ class Tank extends Sprite {
                         resetAllMovingStates(); // Tank
                         this.idle_state = true;
 
-                        System.out.println("! Tank[" + getId() + "].update() – idle_state = true");
+                        //System.out.println("! Tank[" + getId() + "].update() – idle_state = true");
                     }
 
                     // Om tanken håller på och rotera.
@@ -959,12 +959,12 @@ class Tank extends Sprite {
                     }
 
                     if (this.stop_state && !this.isMoving && this.hasTarget) {
-                        System.out.println("Tank["+ this.getId() + "], vill stanna!");
+                        //System.out.println("Tank["+ this.getId() + "], vill stanna!");
                         //this.stop_state = false;
                         stopMoving();
                     }
                     if (this.stop_turning_state && !this.isMoving && this.hasTarget) {
-                        System.out.println("Tank["+ this.getId() + "], vill sluta rotera!");
+                        //System.out.println("Tank["+ this.getId() + "], vill sluta rotera!");
                         stopTurning();
                     }
                 } // end (!this.isImmobilized && this.isReady)
@@ -1030,13 +1030,13 @@ class Tank extends Sprite {
 
     // Tanken meddelas om kollision med trädet.
     public void message_collision(Tree other) {
-        System.out.println("*** Tank["+ this.getId() + "].collision(Tree)");
+        //System.out.println("*** Tank["+ this.getId() + "].collision(Tree)");
         //println("Tank.COLLISION");
     }
 
     // Tanken meddelas om kollision med den andra tanken.
     public void message_collision(Tank other) {
-        System.out.println("*** Tank["+ this.getId() + "].collision(Tank)");
+        //System.out.println("*** Tank["+ this.getId() + "].collision(Tank)");
         //println("Tank.COLLISION");
     }
 
@@ -1092,7 +1092,7 @@ class Tank extends Sprite {
 
         if (distanceVectMag <= minDistance && !this.stop_state) {
 
-            System.out.println("! Tank["+ this.getId() + "] – collided with Tree.");
+            //System.out.println("! Tank["+ this.getId() + "] – collided with Tree.");
 
             if (!this.stop_state) {
                 this.position.set(this.positionPrev); // Flytta tillbaka.
@@ -1138,7 +1138,7 @@ class Tank extends Sprite {
         float minDistance = this.radius + other.radius;
 
         if (distanceVectMag <= minDistance) {
-            System.out.println("! Tank["+ this.getId() + "] – collided with another Tank" + other.team_id + ":"+other.id);
+            //System.out.println("! Tank["+ this.getId() + "] – collided with another Tank" + other.team_id + ":"+other.id);
 
             this.position.set(this.positionPrev); // Flytta tillbaka.
             if (!this.stop_state) {
