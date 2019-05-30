@@ -93,8 +93,11 @@ public class Tank4 extends Tank {
                 if(tank.getTeam().id != this.getTeam().id){
                     enemyLocated = true;
                     enemyInfocus = tank;
-                    enemyLocatedAt.put(tank,tank.position);
-                    sendMessageToTeam("Enemy Located!", tank.position);
+                    if(!enemyLocatedAt.containsKey(obj)){
+                        enemyLocatedAt.put(tank,tank.position);
+                        sendMessageToTeam("Enemy Located!", tank.position);
+                    }
+
                 }
             } else {
                 Tree tree = (Tree) obj;
@@ -200,8 +203,9 @@ public class Tank4 extends Tank {
 
    //BATTLE STATE
     public void battleState(){
-        int decision = getMostRewardingAction();
         getBestTarget();
+        int decision = getMostRewardingAction();
+
         switch (decision){
             case 0:
                 if(idle_state){
@@ -209,7 +213,7 @@ public class Tank4 extends Tank {
                 }
                 break;
             case 1:
-                if(idle_state){
+                if(idle_state && hasClearShot()){
                     fire();
                 }
 
@@ -222,15 +226,17 @@ public class Tank4 extends Tank {
 
     }
     private void getBestTarget(){
-        if(enemyInfocus.health <= 0){
-            enemyLocatedAt.remove(enemyInfocus);
-            enemyInfocus = null;
-        }
-        for(Tank enemy: enemyLocatedAt.keySet()){
-            if(enemyInfocus == null || enemyInfocus.health > enemy.health){
-                enemyInfocus = enemy;
+        if(enemyInfocus != null) {
+            if (enemyInfocus.health <= 0) {
+                enemyLocatedAt.remove(enemyInfocus);
+                enemyInfocus = null;
             }
+            for (Tank enemy : enemyLocatedAt.keySet()) {
+                if (enemy != null && (enemyInfocus == null || enemyInfocus.health > enemy.health)) {
+                    enemyInfocus = enemy;
+                }
 
+            }
         }
     }
 
@@ -239,7 +245,7 @@ public class Tank4 extends Tank {
             System.out.println("TEST 1");
             stopMoving_state();
             return 1;
-        }else if (idle_state && !hasClearShot()){
+        }else if (idle_state && !hasClearShot() && enemyInfocus != null){
             System.out.println("TEST 2");
             rotateTo(enemyInfocus.position);
         }
@@ -248,9 +254,13 @@ public class Tank4 extends Tank {
     }
     public boolean hasClearShot(){
         Sprite obj = getLatestSightSensorReading().obj;
-        if(obj instanceof Tank){
-            return ((Tank) obj).id == enemyInfocus.id;
-        }
+         if(enemyInfocus != null){
+             if(obj instanceof Tank){
+                 return ((Tank) obj).id == enemyInfocus.id;
+             }else if(obj == null){
+                 return true; // inget objekt inom synfältet
+             }
+         }
         return  false;
     }
 

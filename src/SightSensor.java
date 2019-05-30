@@ -35,7 +35,7 @@ public class SightSensor extends Sensor {
         PVector temp = tank.readSensor_distance(tank.getSensor("ULTRASONIC_FRONT")).obj.position;
         boolean hit = lineCircle(tank.position.x, tank.position.y, temp.x, temp.y, read.position.x, read.position.y, radius);
         if (hit) {
-            //if (tank.position.dist(read.position) < 200) {
+            if (tank.position.dist(read.position) < 200) {
                 if (closestObject == null) {
                     closestObject = read;
                     latestReading = new SensorReading(read, PVector.dist(tank.position, read.position), 0);
@@ -43,7 +43,7 @@ public class SightSensor extends Sensor {
                     closestObject = read;
                     latestReading = new SensorReading(read, PVector.dist(tank.position, read.position), 0);
                 }
-            //}
+            }
         }
 
 

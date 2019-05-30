@@ -67,7 +67,7 @@
         boolean tick;
 
         Timer timer;
-        int startTime = 1; //minutes
+        int startTime = 3; //minutes
         int remainingTime;
 
         public Grid getGrid() {
