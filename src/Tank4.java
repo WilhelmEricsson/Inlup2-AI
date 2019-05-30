@@ -93,11 +93,10 @@ public class Tank4 extends Tank {
                 if(tank.getTeam().id != this.getTeam().id){
                     enemyLocated = true;
                     enemyInfocus = tank;
-                    if(!enemyLocatedAt.containsKey(obj)){
+                    if(!enemyLocatedAt.containsKey(tank)|| enemyLocatedAt.get(tank) != tank.position){
                         enemyLocatedAt.put(tank,tank.position);
                         sendMessageToTeam("Enemy Located!", tank.position);
                     }
-
                 }
             } else {
                 Tree tree = (Tree) obj;
@@ -257,11 +256,20 @@ public class Tank4 extends Tank {
          if(enemyInfocus != null){
              if(obj instanceof Tank){
                  return ((Tank) obj).id == enemyInfocus.id;
-             }else if(obj == null){
+             }else if(obj == null && aimingInRightDirection()){
+                 System.out.println("hasClearShot - aim check");
                  return true; // inget objekt inom synfältet
              }
          }
         return  false;
+    }
+    private boolean aimingInRightDirection(){
+        PVector tempTarget = enemyLocatedAt.get(enemyInfocus);
+        PVector target = new PVector(tempTarget.x,tempTarget.y);
+        PVector me = new PVector(this.position.x, this.position.y);
+        PVector positionToAimAt = PVector.sub(target, me);
+
+        return heading == positionToAimAt.heading();
     }
 
     public int calcMoveActionUtil(PVector position){
