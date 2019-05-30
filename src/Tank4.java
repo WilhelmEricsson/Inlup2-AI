@@ -84,6 +84,10 @@ public class Tank4 extends Tank {
         SensorReading reading = getLatestSightSensorReading();
         Sprite obj = reading.obj();
         if (obj != null) {
+            // Rita ut
+            SightSensor sens = (SightSensor)getSensor("SIGHT_SENSOR");
+            sens.drawSensor(reading.obj().position);
+
             if (obj instanceof Tank) {
                 Tank tank = (Tank) obj;
                 if(tank.getTeam().id != this.getTeam().id){
