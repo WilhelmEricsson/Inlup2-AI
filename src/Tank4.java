@@ -9,7 +9,7 @@ public class Tank4 extends Tank {
     private ArrayList<Sprite> obstacles;
     private Tank enemyInfocus; // den tanken som ämnas bekämpas
     private HashMap<Tank, PVector> enemyLocatedAt;
-
+    private HashSet<PVector> blockedPaths;
 
     private PVector nextPosition = new PVector(0,0);
 
@@ -19,6 +19,7 @@ public class Tank4 extends Tank {
         enemyLocatedAt = new HashMap<>();
         enemyLocated = false;
         this.started = false;
+        blockedPaths = new HashSet<>();
     }
 
     @Override
@@ -51,7 +52,17 @@ public class Tank4 extends Tank {
 
     }
 
+    @Override
+    public void checkEnvironment(){
+        super.checkEnvironment();
+        if(isMoving){
+            if(isPathBlocked()){
+                blockedPaths.add(nextPosition);
+                stopMoving_state();
+            }
+        }
 
+    }
 
 
 
@@ -66,6 +77,7 @@ public class Tank4 extends Tank {
         super.arrived();
         System.out.println("*** Team"+this.team_id+".Tank["+ this.getId() + "].arrived()");
         ((Team1)getTeam()).addSearchedArea(this.position);
+        blockedPaths.clear();
         //isMoving = false;
         //moveTo(new PVector(int(random(width)),int(random(height))));
         //moveTo(grid.getRandomNodePosition());
@@ -75,8 +87,24 @@ public class Tank4 extends Tank {
     @Override
     public void arrivedRotation() {
         super.arrivedRotation();
-        moveTo(nextPosition);
+        if(!isPathBlocked()){
+            moveTo(nextPosition);
+        }else{
+            blockedPaths.add(nextPosition);
+        }
+
+
         //isMoving = true;
+    }
+    private boolean isPathBlocked(){
+        boolean isPathBlocked = false;
+        Sprite tempObj = getLatestSightSensorReading().obj;
+        if(tempObj != null){
+            if(this.position.dist(tempObj.position) < this.position.dist(nextPosition)){
+                isPathBlocked = true;
+            }
+        }
+        return isPathBlocked;
     }
 
     @Override
@@ -178,7 +206,7 @@ public class Tank4 extends Tank {
                 tempPositions.add(position);
             }
         }
-        System.out.println("TEMP POSITIONS: " + tempPositions.size());
+        System.out.println("TEMP POSITIONS: " + tempPositions.size() + " TANK ID: " + id);
         return tempPositions;
     }
 
@@ -242,11 +270,12 @@ public class Tank4 extends Tank {
     }
 
     private int getMostRewardingAction(){
-        if(hasClearShot() && hasShot){
+        boolean hasClearShot = hasClearShot();
+        if(hasClearShot && hasShot){
             System.out.println("TEST 1");
             stopMoving_state();
             return 1;
-        }else if (idle_state && !hasClearShot() && enemyInfocus != null){
+        }else if (idle_state && !hasClearShot && enemyInfocus != null){
             System.out.println("TEST 2");
             rotateTo(enemyInfocus.position);
         }
@@ -277,7 +306,7 @@ public class Tank4 extends Tank {
 
     public int calcMoveActionUtil(PVector position){
         int util = -1;
-        if(isObstacle(position)){
+        if(isObstacle(position) || blockedPaths.contains(position)){
             util = Integer.MIN_VALUE;
             return util;
         }
