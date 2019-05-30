@@ -80,7 +80,7 @@ public class Tank4 extends Tank {
             receiveMessage();
         }
 
-        if(enemyLocated ){
+        if(enemyLocated){
             battleState();
         }else{
             if(idle_state ) {
@@ -172,7 +172,58 @@ public class Tank4 extends Tank {
 
    //BATTLE STATE
     public void battleState(){
+        int decision = getMostRewardingAction();
+        getBestTarget();
+        switch (decision){
+            case 0:
+                if(idle_state){
+                    searchState();
+                }
+                break;
+            case 1:
+                if(idle_state){
+                    fire();
+                }
 
+                break;
+
+            default:
+
+
+        }
+
+    }
+    private void getBestTarget(){
+        if(enemyInfocus.health <= 0){
+            enemyLocatedAt.remove(enemyInfocus);
+            enemyInfocus = null;
+        }
+        for(Tank enemy: enemyLocatedAt.keySet()){
+            if(enemyInfocus == null || enemyInfocus.health > enemy.health){
+                enemyInfocus = enemy;
+            }
+
+        }
+    }
+
+    private int getMostRewardingAction(){
+        if(hasClearShot() && hasShot){
+            System.out.println("TEST 1");
+            stopMoving_state();
+            return 1;
+        }else if (idle_state && !hasClearShot()){
+            System.out.println("TEST 2");
+            rotateTo(enemyInfocus.position);
+        }
+
+        return 0;
+    }
+    public boolean hasClearShot(){
+        Sprite obj = ((SightSensor)getSensor("SIGHT_SENSOR")).readValue(enemyInfocus,(int)enemyInfocus.radius).obj;
+        if(obj instanceof Tank){
+            return ((Tank) obj).id == enemyInfocus.id;
+        }
+        return  false;
     }
 
     public int calcMoveActionUtil(PVector position){
@@ -181,17 +232,19 @@ public class Tank4 extends Tank {
             util = Integer.MIN_VALUE;
             return util;
         }
-        if(enemyLocated){
+        if(enemyLocated && hasShot){
+
             Iterator<PVector> positions = enemyLocatedAt.values().iterator();
             PVector closest = null;
-            while(positions.hasNext()){
+            while (positions.hasNext()) {
                 PVector temp = positions.next();
-                if(closest == null || position.dist(temp) < position.dist(closest)){
-                    util = -(int)position.dist(temp);
+                if (closest == null || position.dist(temp) < position.dist(closest)) {
+                    util = -(int) position.dist(temp);
                     closest = temp;
                 }
 
             }
+
         }else{
             if(((Team1)team).isPosistionSearched(position)){
                 util -= 1;
@@ -199,6 +252,7 @@ public class Tank4 extends Tank {
         }
         return util;
     }
+
 
     private int argMax(float[] utility){
         int max = 0;
