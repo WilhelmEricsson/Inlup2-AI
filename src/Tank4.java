@@ -243,7 +243,7 @@ public class Tank4 extends Tank {
         return 0;
     }
     public boolean hasClearShot(){
-        Sprite obj = ((SightSensor)getSensor("SIGHT_SENSOR")).readValue(enemyInfocus,(int)enemyInfocus.radius).obj;
+        Sprite obj = ((SightSensor)getSensor("SIGHT_SENSOR")).getLatestReading().obj;
         if(obj instanceof Tank){
             return ((Tank) obj).id == enemyInfocus.id;
         }
