@@ -3,9 +3,8 @@ import processing.core.PVector;
 import static processing.core.PApplet.*;
 
 public class SightSensor extends Sensor {
-
     PVector intersectPoint = null;
-
+    SensorReading latestReading = null;
     SightSensor(Tank t) {
         super(t);
     }
@@ -17,7 +16,17 @@ public class SightSensor extends Sensor {
     public SensorReading readValue(Sprite read, int radius){
         PVector checkPos = read.position;
         SensorReading sr = new SensorReading();
-        PVector temp = tank.readSensor_distance(tank.getSensor("ULTRASONIC_FRONT")).obj.position;
+
+        PVector temp = PVector.fromAngle(tank.heading);
+                //tank.readSensor_distance(tank.getSensor("ULTRASONIC_FRONT")).obj.position;
+        temp.normalize();
+        temp.mult(200);
+        //System.out.println("TEST: " + temp.toString());
+        tank.getTp().pushMatrix();
+        tank.getTp().translate(tank.position.x,tank.position.y);
+        tank.getTp().ellipse(temp.x,temp.y,20 ,20);
+        tank.getTp().line(0, 0, temp.x, temp.y);
+        tank.getTp().popMatrix();
 
         PVector t = new PVector(tank.position.x, tank.position.y);
         PVector sub = PVector.sub(temp, t);
@@ -62,7 +71,7 @@ public class SightSensor extends Sensor {
                 sr = new SensorReading(read, PVector.dist(t, checkPos), 0F);
             }
         }
-
+        latestReading = sr;
         return sr;
     }
 }

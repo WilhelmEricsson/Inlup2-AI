@@ -3,6 +3,7 @@ import processing.core.PVector;
 import java.util.*;
 
 public class Tank4 extends Tank {
+    private static final String[] MESSAGE = new String[]{"Enemy Located!"};
     private boolean enemyLocated;
     private boolean started;
     private ArrayList<Tree> obstacles;
@@ -10,7 +11,7 @@ public class Tank4 extends Tank {
     private HashMap<Tank, PVector> enemyLocatedAt;
 
 
-    PVector nextPosition = new PVector(0,0);
+    private PVector nextPosition = new PVector(0,0);
 
     Tank4(int id, Team team, PVector startpos, float diameter, CannonBall ball, TankProg tp) {
         super(id, team, startpos, diameter, ball, tp);
@@ -27,6 +28,19 @@ public class Tank4 extends Tank {
 
             if(!obstacles.contains(other)){
                 obstacles.add(other);
+            }
+        }
+
+    }
+    @Override
+    public void checkCollision(Tank other){
+        super.checkCollision(other);
+        if(readSightSensor(other)){
+            if(other.getTeam().id != this.getTeam().id){
+                enemyLocated = true;
+                enemyInfocus = other;
+                enemyLocatedAt.put(other,other.position);
+                sendMessageToTeam("Enemy Located!", other.position);
             }
         }
 
@@ -62,10 +76,14 @@ public class Tank4 extends Tank {
 
     @Override
     public void updateLogic() {
-        if(enemyLocated){
+        if(messageReceived){
+            receiveMessage();
+        }
+
+        if(enemyLocated ){
             battleState();
         }else{
-            if(idle_state) {
+            if(idle_state ) {
                 searchState();
             }
         }
@@ -76,6 +94,17 @@ public class Tank4 extends Tank {
         nextPosition = getNextPosition();
         rotateTo(nextPosition);
     }
+
+    private void receiveMessage(){
+        TankMessage tankMessage = getMessageReceived();
+
+        if(tankMessage.getMessage() == MESSAGE[0]){
+            System.out.println("Message from: " + tankMessage.getSender() + " - "  + tankMessage.getMessage()+  " " + tankMessage.getPosition().toString());
+            enemyLocated = true;
+            enemyLocatedAt.put(null, tankMessage.getPosition());
+        }
+    }
+
 
     private PVector getNextPosition(){
         boolean validPosition = false;
@@ -97,18 +126,31 @@ public class Tank4 extends Tank {
         potentialPosition.add(new PVector(this.position.x-stepDist, this.position.y));
         //NW
         potentialPosition.add(new PVector(this.position.x-stepDist, this.position.y-stepDist));
-        while(!validPosition){
-            nextPosition = potentialPosition.get(Util.getRndDecision(potentialPosition.size()));
-            //Detta måste fixas så att casten är säker.
-            if(!((Team1)getTeam()).isPosistionSearched(nextPosition) && !isObstacle(nextPosition)){
-                break;
-            }else{
-                potentialPosition.remove(nextPosition);
-            }
-        }
+        potentialPosition = calcPotentialMoveActionsUtil(potentialPosition);
+
+        nextPosition = potentialPosition.get(Util.getRndDecision(potentialPosition.size()));
+        System.out.println("Next: " + nextPosition + " enemy found: " + enemyLocated + " Actions: " + potentialPosition.size());
 
         return nextPosition;
     }
+    private ArrayList<PVector> calcPotentialMoveActionsUtil(ArrayList<PVector> potentialPositions){
+        int highestUtil = Integer.MIN_VALUE;
+        ArrayList<PVector> tempPositions = new ArrayList<>();
+        for(PVector position : potentialPositions){
+            int positionUtil = calcMoveActionUtil(position);
+            System.out.println("Position: " + position.toString()+ " Util: "  + positionUtil);
+            if(highestUtil < positionUtil){
+                highestUtil = positionUtil;
+                tempPositions = new ArrayList<>();
+                tempPositions.add(position);
+            }else if(highestUtil == positionUtil){
+                tempPositions.add(position);
+            }
+        }
+        System.out.println("TEMP POSITIONS: " + tempPositions.size());
+        return tempPositions;
+    }
+
     private boolean isObstacle(PVector pos){
         Iterator<Tree> obst = obstacles.iterator();
         boolean isObst = false;
@@ -132,9 +174,30 @@ public class Tank4 extends Tank {
     public void battleState(){
 
     }
-    @Override
-    public int calcUtil(){
-        return 0;
+
+    public int calcMoveActionUtil(PVector position){
+        int util = -1;
+        if(isObstacle(position)){
+            util = Integer.MIN_VALUE;
+            return util;
+        }
+        if(enemyLocated){
+            Iterator<PVector> positions = enemyLocatedAt.values().iterator();
+            PVector closest = null;
+            while(positions.hasNext()){
+                PVector temp = positions.next();
+                if(closest == null || position.dist(temp) < position.dist(closest)){
+                    util = -(int)position.dist(temp);
+                    closest = temp;
+                }
+
+            }
+        }else{
+            if(((Team1)team).isPosistionSearched(position)){
+                util -= 1;
+            }
+        }
+        return util;
     }
 
     private int argMax(float[] utility){

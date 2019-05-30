@@ -834,9 +834,9 @@ class Tank extends Sprite {
     //**************************************************
     // Är tänkt att överskuggas (override) i subklassen.
     void updateLogic() {
-        if(!isDestroyed && !isMoving && idle_state){
+       /*if(!isDestroyed && !isMoving && idle_state){
             chooseAction();
-        }
+        }*/
 
     }
 
