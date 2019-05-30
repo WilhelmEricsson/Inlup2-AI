@@ -6,7 +6,7 @@ public class Tank4 extends Tank {
     private static final String[] MESSAGE = new String[]{"Enemy Located!"};
     private boolean enemyLocated;
     private boolean started;
-    private ArrayList<Tree> obstacles;
+    private ArrayList<Sprite> obstacles;
     private Tank enemyInfocus; // den tanken som ämnas bekämpas
     private HashMap<Tank, PVector> enemyLocatedAt;
 
@@ -93,7 +93,7 @@ public class Tank4 extends Tank {
                 if(tank.getTeam().id != this.getTeam().id){
                     enemyLocated = true;
                     enemyInfocus = tank;
-                    if(!enemyLocatedAt.containsKey(tank)|| enemyLocatedAt.get(tank) != tank.position){
+                    if((!enemyLocatedAt.containsKey(tank)|| enemyLocatedAt.get(tank) != tank.position) && tank.health > 0){
                         enemyLocatedAt.put(tank,tank.position);
                         sendMessageToTeam("Enemy Located!", tank.position);
                     }
@@ -182,10 +182,10 @@ public class Tank4 extends Tank {
     }
 
     private boolean isObstacle(PVector pos){
-        Iterator<Tree> obst = obstacles.iterator();
+        Iterator<Sprite> obst = obstacles.iterator();
         boolean isObst = false;
         while(obst.hasNext()){
-            Tree temp = obst.next();
+            Sprite temp = obst.next();
             if((temp.position.x-temp.radius-this.radius) <= pos.x && (temp.position.x+temp.radius+this.radius)  >= pos.x){
                 if((temp.position.y-temp.radius-this.radius) <= pos.y && (temp.position.y+temp.radius+this.radius)  >= pos.y){
                     isObst = true;
@@ -228,6 +228,7 @@ public class Tank4 extends Tank {
         if(enemyInfocus != null) {
             if (enemyInfocus.health <= 0) {
                 enemyLocatedAt.remove(enemyInfocus);
+                obstacles.add(enemyInfocus);
                 enemyInfocus = null;
             }
             for (Tank enemy : enemyLocatedAt.keySet()) {
@@ -254,6 +255,7 @@ public class Tank4 extends Tank {
     public boolean hasClearShot(){
         Sprite obj = getLatestSightSensorReading().obj;
          if(enemyInfocus != null){
+
              if(obj instanceof Tank){
                  return ((Tank) obj).id == enemyInfocus.id;
              }else if(obj == null && aimingInRightDirection()){
