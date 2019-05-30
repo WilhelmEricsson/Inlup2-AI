@@ -3,29 +3,48 @@ import processing.core.PVector;
 import static processing.core.PApplet.*;
 
 public class SightSensor extends Sensor {
-    PVector intersectPoint = null;
-    SensorReading latestReading = null;
+
+    Sprite closestObject = null;
+    SensorReading latestReading;
+
     SightSensor(Tank t) {
         super(t);
+        latestReading = new SensorReading();
     }
 
-    public PVector getIntersectPoint() {
-        return intersectPoint;
+    public SensorReading getLatestReading() {
+        SensorReading temp = latestReading;
+        reset();
+        return temp;
+    }
+
+    public void reset() {
+        closestObject = null;
+        latestReading = new SensorReading();
+    }
+
+    public void drawSensor(PVector draw) {
+        getTank().getTp().pushMatrix();
+        getTank().getTp().fill(255, 255, 0);
+        getTank().getTp().ellipse(draw.x, draw.y, 100, 100);
+        getTank().getTp().popMatrix();
     }
 
     // ty http://jeffreythompson.org/collision-detection/line-circle.php
-    public SensorReading readValue(Sprite read, int radius){
+    public void readValue(Sprite read, int radius){
         PVector temp = tank.readSensor_distance(tank.getSensor("ULTRASONIC_FRONT")).obj.position;
-        SensorReading sr = new SensorReading();
         boolean hit = lineCircle(tank.position.x, tank.position.y, temp.x, temp.y, read.position.x, read.position.y, radius);
         if (hit) {
-            getTank().getTp().pushMatrix();
-            getTank().getTp().fill(255, 255, 0);
-            getTank().getTp().ellipse(read.position.x, read.position.y, 100, 100);
-            getTank().getTp().popMatrix();
-            sr = new SensorReading(read, PVector.dist(tank.position, read.position), 0F);
+            //if (tank.position.dist(read.position) < 200) {
+                if (closestObject == null) {
+                    closestObject = read;
+                    latestReading = new SensorReading(read, PVector.dist(tank.position, read.position), 0);
+                } else if (tank.position.dist(read.position) < tank.position.dist(closestObject.position)) {
+                    closestObject = read;
+                    latestReading = new SensorReading(read, PVector.dist(tank.position, read.position), 0);
+                }
+            //}
         }
-        return sr;
 
 
         /*

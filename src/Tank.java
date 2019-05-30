@@ -92,7 +92,6 @@ class Tank extends Sprite {
     protected ArrayList<Sensor> mySensors = new ArrayList<Sensor>();
 
 
-    private SensorReading latestSensorReading = null;
     protected boolean messageReceived = false;
     private TankProg tp;
 
@@ -838,6 +837,13 @@ class Tank extends Sprite {
             chooseAction();
         }*/
 
+        // Use of SightSensor example
+        /*
+        SensorReading reading = getLatestSightSensorReading();
+        if (reading.obj() != null) {
+            SightSensor sens = (SightSensor)getSensor("SIGHT_SENSOR");
+            sens.drawSensor(reading.obj().position);
+        }*/
     }
 
     public void chooseAction(){
@@ -1054,30 +1060,18 @@ class Tank extends Sprite {
     }
 
     // Reads sensor value for of SightSensor given the sprite, returns true if it was in the tanks field of view
-    protected Boolean readSightSensor(Sprite sprite) {
+    protected void readSightSensor(Sprite sprite) {
         SightSensor sens = (SightSensor) getSensor("SIGHT_SENSOR");
 
         if (sprite instanceof Tree) {
-            latestSensorReading = sens.readValue(sprite, 50);
+            sens.readValue(sprite, 50);
         } else {
-            latestSensorReading = sens.readValue(sprite, 25);
+            sens.readValue(sprite, 25);
         }
-
-        if (latestSensorReading.obj == null) {
-            return false;
-        }
-
-        //drawSightSensor();
-
-        return true;
     }
 
-    private void drawSightSensor() {
-        SightSensor sens = (SightSensor) getSensor("SIGHT_SENSOR");
-        tp.pushMatrix();
-        tp.fill(255,255,0);
-        tp.ellipse(sens.getIntersectPoint().x, sens.getIntersectPoint().y, 50, 50);
-        tp.popMatrix();
+    public SensorReading getLatestSightSensorReading() {
+        return ((SightSensor) getSensor("SIGHT_SENSOR")).getLatestReading();
     }
 
     //**************************************************
