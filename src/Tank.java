@@ -1074,6 +1074,10 @@ class Tank extends Sprite {
         return ((SightSensor) getSensor("SIGHT_SENSOR")).getLatestReading();
     }
 
+    public void resetSightSensorReading() {
+        ((SightSensor) getSensor("SIGHT_SENSOR")).reset();
+    }
+
     //**************************************************
     public void checkCollision(Tree other) {
 

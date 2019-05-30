@@ -117,6 +117,7 @@ public class Tank4 extends Tank {
                 searchState();
             }
         }
+        resetSightSensorReading();
     }
 
     //SEARCH STATE -- Random search, with preference to position located further away from home base/starting position

@@ -14,7 +14,6 @@ public class SightSensor extends Sensor {
 
     public SensorReading getLatestReading() {
         SensorReading temp = latestReading;
-        reset();
         return temp;
     }
 
