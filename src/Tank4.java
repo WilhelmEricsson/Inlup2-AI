@@ -65,7 +65,17 @@ public class Tank4 extends Tank {
     public void arrived() {
         super.arrived();
         System.out.println("*** Team"+this.team_id+".Tank["+ this.getId() + "].arrived()");
-        ((Team1)getTeam()).addSearchedArea(this.position);
+
+        if (this.getTeam().getId() == 0) {
+            if(((Team1)team).isPosistionSearched(position)){
+                ((Team1)getTeam()).addSearchedArea(this.position);
+            }
+        } else if (this.getTeam().getId() == 1) {
+            if(((Team2)team).isPosistionSearched(position)){
+                ((Team2)getTeam()).addSearchedArea(this.position);
+            }
+        }
+        
         //isMoving = false;
         //moveTo(new PVector(int(random(width)),int(random(height))));
         //moveTo(grid.getRandomNodePosition());
@@ -293,9 +303,16 @@ public class Tank4 extends Tank {
             }
 
         }else{
-            if(((Team1)team).isPosistionSearched(position)){
-                util -= 1;
+            if (this.getTeam().getId() == 0) {
+                if(((Team1)team).isPosistionSearched(position)){
+                    util -= 1;
+                }
+            } else if (this.getTeam().getId() == 1) {
+                if(((Team2)team).isPosistionSearched(position)){
+                    util -= 1;
+                }
             }
+
         }
         return util;
     }
