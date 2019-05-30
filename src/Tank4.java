@@ -24,17 +24,22 @@ public class Tank4 extends Tank {
     @Override
     public void checkCollision(Tree other){
         super.checkCollision(other);
+        readSightSensor(other);
+        /*
         if(readSightSensor(other)){
-
             if(!obstacles.contains(other)){
                 obstacles.add(other);
             }
-        }
+        }*/
 
     }
     @Override
     public void checkCollision(Tank other){
         super.checkCollision(other);
+        if (this.id != other.id) {
+            readSightSensor(other);
+        }
+        /*
         if(readSightSensor(other)){
             if(other.getTeam().id != this.getTeam().id){
                 enemyLocated = true;
@@ -42,7 +47,7 @@ public class Tank4 extends Tank {
                 enemyLocatedAt.put(other,other.position);
                 sendMessageToTeam("Enemy Located!", other.position);
             }
-        }
+        }*/
 
     }
 
@@ -76,6 +81,25 @@ public class Tank4 extends Tank {
 
     @Override
     public void updateLogic() {
+        SensorReading reading = getLatestSightSensorReading();
+        Sprite obj = reading.obj();
+        if (obj != null) {
+            if (obj instanceof Tank) {
+                Tank tank = (Tank) obj;
+                if(tank.getTeam().id != this.getTeam().id){
+                    enemyLocated = true;
+                    enemyInfocus = tank;
+                    enemyLocatedAt.put(tank,tank.position);
+                    sendMessageToTeam("Enemy Located!", tank.position);
+                }
+            } else {
+                Tree tree = (Tree) obj;
+                if(!obstacles.contains(obj)){
+                    obstacles.add(tree);
+                }
+            }
+        }
+
         if(messageReceived){
             receiveMessage();
         }
