@@ -3,7 +3,6 @@ import processing.core.PVector;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Random;
 
 import static processing.core.PApplet.radians;
 import static processing.core.PApplet.saveStream;
@@ -1078,6 +1077,8 @@ class Tank extends Sprite {
         ((SightSensor) getSensor("SIGHT_SENSOR")).reset();
     }
 
+    protected boolean collided = false;
+
     //**************************************************
     public void checkCollision(Tree other) {
 
@@ -1104,11 +1105,14 @@ class Tank extends Sprite {
                 // Kontroll om att tanken inte "fastnat" i en annan tank.
                 distanceVect = PVector.sub(other.position, this.position);
                 distanceVectMag = distanceVect.mag();
+
+                // Tror att lägga allt i else-satsen fixade så dem inte fuckar ur ifall dem fastnar i varandra
                 if (distanceVectMag < minDistance) {
                     System.out.println("! Tank["+ this.getId() + "] – FAST I ETT TRÄD");
+                } else {
+                    collided = true;
+                    stopMoving_state();
                 }
-
-                stopMoving_state();
             }
 
             if (this.hasShot) {
@@ -1152,13 +1156,16 @@ class Tank extends Sprite {
                 distanceVect = PVector.sub(other.position, this.position);
                 distanceVectMag = distanceVect.mag();
 
-
+                // Tror att lägga allt i else-satsen fixade så dem inte fuckar ur ifall dem fastnar i varandra
                 if (distanceVectMag <= minDistance) {
                     System.out.println("! Tank["+ this.getId() + "] – FAST I EN ANNAN TANK");
+                } else {
+                    collided = true;
+                    this.isMoving = false;
+                    stopMoving_state();
                 }
 
-                this.isMoving = false;
-                stopMoving_state();
+
             }
 
             if (this.hasShot) {
@@ -1194,8 +1201,13 @@ class Tank extends Sprite {
     }
 
     void displayInfo() {
+        String[] blockedPaths = new String[8];
+        if (this instanceof Tank4) {
+            Tank4 test = (Tank4) this;
+            blockedPaths = test.blockedPaths.toArray(new String[8]);
+        }
         tp.fill(230);
-        tp.rect(tp.width - 151, 0, 150, 300);
+        tp.rect(tp.width - 151, 0, 150, 420);
         tp.strokeWeight(1);
         tp.fill(255, 0, 0);
         tp.stroke(255, 0, 0);
@@ -1215,7 +1227,15 @@ class Tank extends Sprite {
                         "isImmobilized : "+this.isImmobilized +"\n"+
                         "targetHeading : "+this.targetHeading +"\n"+
                         "heading : "+this.heading +"\n"+
-                        "heading_saved: "+this.heading_saved +"\n"
+                        "heading_saved: "+this.heading_saved +"\n"+
+                        "blockedPaths: "+blockedPaths[0] +"\n"+
+                        "blockedPaths: "+blockedPaths[1] +"\n"+
+                        "blockedPaths: "+blockedPaths[2] +"\n"+
+                        "blockedPaths: "+blockedPaths[3] +"\n"+
+                        "blockedPaths: "+blockedPaths[4] +"\n"+
+                        "blockedPaths: "+blockedPaths[5] +"\n"+
+                        "blockedPaths: "+blockedPaths[6] +"\n"+
+                        "blockedPaths: "+blockedPaths[7] +"\n"
                 , tp.width - 145, 35 );
     }
 
