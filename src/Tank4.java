@@ -9,9 +9,12 @@ public class Tank4 extends Tank {
     private ArrayList<Sprite> obstacles;
     private Tank enemyInfocus; // den tanken som ämnas bekämpas
     private HashMap<Tank, PVector> enemyLocatedAt;
-    private HashSet<PVector> blockedPaths;
+    protected HashSet<String> blockedPaths;
     private SensorReading latestSightSensorReadning;
     private PVector nextPosition = new PVector(0,0);
+
+    private PVector lastPosition = new PVector(0,0);
+    private String lastDirection = "";
 
     Tank4(int id, Team team, PVector startpos, float diameter, CannonBall ball, TankProg tp) {
         super(id, team, startpos, diameter, ball, tp);
@@ -56,14 +59,6 @@ public class Tank4 extends Tank {
     @Override
     public void checkEnvironment(){
         super.checkEnvironment();
-        if(isFrontTowardsNextPosition()){
-            if(isPathBlocked()){
-                System.out.println("TANK: " + id + " IS BLOCKED " );
-                blockedPaths.add(nextPosition);
-                stopMoving_state();
-            }
-        }
-
     }
     private boolean isFrontTowardsNextPosition(){
         PVector tempTargetPosition = nextPosition;
@@ -83,10 +78,11 @@ public class Tank4 extends Tank {
         //rotateTo(grid.getRandomNodePosition());
     }
 
+    @Override
     public void arrived() {
         super.arrived();
         System.out.println("*** Team"+this.team_id+".Tank["+ this.getId() + "].arrived()");
-        blockedPaths.clear();
+        //((Team1)getTeam()).addSearchedArea(this.position);
 
         if (this.getTeam().getId() == 0) {
             if(((Team1)team).isPosistionSearched(position)){
@@ -107,15 +103,15 @@ public class Tank4 extends Tank {
     @Override
     public void arrivedRotation() {
         super.arrivedRotation();
-        if(!isPathBlocked()){
-            moveTo(nextPosition);
-        }else{
-            blockedPaths.add(nextPosition);
-        }
 
+        lastPosition = new PVector(position.x, position.y);
+
+        moveTo(nextPosition);
 
         //isMoving = true;
     }
+
+    /*
     private boolean isPathBlocked(){
         boolean isPathBlocked = false;
         Sprite tempObj = latestSightSensorReadning.obj;
@@ -125,10 +121,21 @@ public class Tank4 extends Tank {
             }
         }
         return isPathBlocked;
-    }
+    }*/
 
     @Override
     public void updateLogic() {
+        // Ifall tanken krockade kolla ifall den kom längre än 25 dist från förra, ifall inte så blockera den riktningen
+        if (collided) {
+            if (lastPosition.dist(position) < 25) {
+                blockedPaths.add(lastDirection);
+                System.out.println(id + " added " + lastDirection + " to blocked paths.");
+            }
+            collided = false;
+        }
+
+        SensorReading reading = getLatestSightSensorReading();
+        Sprite obj = reading.obj();
         readSensor();
 
         if(messageReceived){
@@ -221,10 +228,52 @@ public class Tank4 extends Tank {
         potentialPosition = calcPotentialMoveActionsUtil(potentialPosition);
 
         PVector nextPosition = potentialPosition.get(Util.getRndDecision(potentialPosition.size()));
+        nextPosition = potentialPosition.get(Util.getRndDecision(potentialPosition.size()));
+
+        // Ifall tanken kom mer än 100 dist ifrån förra positionen så är det lugnt och blockePaths clear:as
+        if (lastPosition.dist(position) > 100) {
+            if (!blockedPaths.isEmpty()) {
+                blockedPaths.clear();
+                System.out.println(id + " cleared blocked paths");
+            }
+        }
+
+        // blockedPaths clear:as också ifall alla har testats för att försöka alla på nytt
+        if (blockedPaths.size() == 8) {
+            blockedPaths.clear();
+        }
+
+        //Sparar senaste riktningen för att seedan lägga till den om tanken krockade och inte kom längre än 25 dist (updateLogic)
+        lastDirection = calculateDirection(nextPosition);
+
         System.out.println("Next: " + nextPosition + " enemy found: " + enemyLocated + " Actions: " + potentialPosition.size());
 
         return nextPosition;
     }
+
+    // Finns nog en bättre lösning menmen
+    private String calculateDirection(PVector nextPosition) {
+        String direction = "";
+        if (nextPosition.equals(new PVector(position.x, position.y-stepDist))) {
+            direction = "N";
+        } else if (nextPosition.equals(new PVector(position.x+stepDist, position.y-stepDist))) {
+            direction = "NE";
+        } else if (nextPosition.equals(new PVector(position.x+stepDist, position.y))) {
+            direction = "E";
+        } else if (nextPosition.equals(new PVector(position.x+stepDist, position.y+stepDist))) {
+            direction = "SE";
+        } else if (nextPosition.equals(new PVector(position.x, position.y+stepDist))) {
+            direction = "S";
+        } else if (nextPosition.equals(new PVector(position.x-stepDist, position.y+stepDist))) {
+            direction = "SW";
+        } else if (nextPosition.equals(new PVector(position.x-stepDist, position.y))) {
+            direction = "W";
+        } else if (nextPosition.equals(new PVector(position.x-stepDist, position.y-stepDist))) {
+            direction = "NW";
+        }
+        return direction;
+    }
+
     private ArrayList<PVector> calcPotentialMoveActionsUtil(ArrayList<PVector> potentialPositions){
         int highestUtil = Integer.MIN_VALUE;
         ArrayList<PVector> tempPositions = new ArrayList<>();
@@ -338,8 +387,10 @@ public class Tank4 extends Tank {
     }
 
     public int calcMoveActionUtil(PVector position){
+        String direction = calculateDirection(position);
+
         int util = -1;
-        if(isObstacle(position) || blockedPaths.contains(position)){
+        if(isObstacle(position) || blockedPaths.contains(direction)){
             util = Integer.MIN_VALUE;
             return util;
         }
