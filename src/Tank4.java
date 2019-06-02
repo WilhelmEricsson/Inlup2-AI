@@ -10,7 +10,7 @@ public class Tank4 extends Tank {
     private Tank enemyInfocus; // den tanken som ämnas bekämpas
     private HashMap<Tank, PVector> enemyLocatedAt;
     private HashSet<PVector> blockedPaths;
-
+    private SensorReading latestSightSensorReadning;
     private PVector nextPosition = new PVector(0,0);
 
     Tank4(int id, Team team, PVector startpos, float diameter, CannonBall ball, TankProg tp) {
@@ -20,6 +20,7 @@ public class Tank4 extends Tank {
         enemyLocated = false;
         this.started = false;
         blockedPaths = new HashSet<>();
+       SensorReading latestSightSensorReadning = new SensorReading();
     }
 
     @Override
@@ -55,13 +56,22 @@ public class Tank4 extends Tank {
     @Override
     public void checkEnvironment(){
         super.checkEnvironment();
-        if(isMoving){
+        if(isFrontTowardsNextPosition()){
             if(isPathBlocked()){
+                System.out.println("TANK: " + id + " IS BLOCKED " );
                 blockedPaths.add(nextPosition);
                 stopMoving_state();
             }
         }
 
+    }
+    private boolean isFrontTowardsNextPosition(){
+        PVector tempTargetPosition = nextPosition;
+        PVector targetPosition = new PVector(tempTargetPosition.x,tempTargetPosition.y);
+        PVector me = new PVector(this.position.x, this.position.y);
+        PVector nextPositionDirection= PVector.sub(targetPosition, me);
+
+        return heading == nextPositionDirection.heading();
     }
 
 
@@ -76,7 +86,6 @@ public class Tank4 extends Tank {
     public void arrived() {
         super.arrived();
         System.out.println("*** Team"+this.team_id+".Tank["+ this.getId() + "].arrived()");
-        ((Team1)getTeam()).addSearchedArea(this.position);
         blockedPaths.clear();
 
         if (this.getTeam().getId() == 0) {
@@ -109,7 +118,7 @@ public class Tank4 extends Tank {
     }
     private boolean isPathBlocked(){
         boolean isPathBlocked = false;
-        Sprite tempObj = getLatestSightSensorReading().obj;
+        Sprite tempObj = latestSightSensorReadning.obj;
         if(tempObj != null){
             if(this.position.dist(tempObj.position) < this.position.dist(nextPosition)){
                 isPathBlocked = true;
@@ -120,12 +129,28 @@ public class Tank4 extends Tank {
 
     @Override
     public void updateLogic() {
-        SensorReading reading = getLatestSightSensorReading();
-        Sprite obj = reading.obj();
+        readSensor();
+
+        if(messageReceived){
+            receiveMessage();
+        }
+
+        if(enemyLocated){
+            battleState();
+        }else{
+            if(idle_state) {
+                searchState();
+            }
+        }
+        resetSightSensorReading();
+    }
+    private void readSensor(){
+        latestSightSensorReadning = getLatestSightSensorReading();
+        Sprite obj = latestSightSensorReadning.obj();
         if (obj != null) {
             // Rita ut
             SightSensor sens = (SightSensor)getSensor("SIGHT_SENSOR");
-            sens.drawSensor(reading.obj().position);
+            sens.drawSensor(latestSightSensorReadning.obj().position);
 
             if (obj instanceof Tank) {
                 Tank tank = (Tank) obj;
@@ -144,26 +169,25 @@ public class Tank4 extends Tank {
                 }
             }
         }
-
-        if(messageReceived){
-            receiveMessage();
-        }
-
-        if(enemyLocated){
-            battleState();
-        }else{
-            if(idle_state ) {
-                searchState();
-            }
-        }
-        resetSightSensorReading();
     }
 
     //SEARCH STATE -- Random search, with preference to position located further away from home base/starting position
     public void searchState(){
-        nextPosition = getNextPosition();
-        rotateTo(nextPosition);
+        if(!isDestroyed && !isImmobilized){
+            nextPosition = getNextPosition();
+            rotateTo(nextPosition);
+        }else{
+            turnTurretTowardsEnemy();
+        }
     }
+    private void turnTurretTowardsEnemy(){
+        if(enemyInfocus != null && !aimingInRightDirection()){
+            turnLeft_state();
+        }else{
+            stopTurretTurning_state();
+        }
+    }
+
 
     private void receiveMessage(){
         TankMessage tankMessage = getMessageReceived();
@@ -177,8 +201,6 @@ public class Tank4 extends Tank {
 
 
     private PVector getNextPosition(){
-        boolean validPosition = false;
-        PVector nextPosition = null;
         ArrayList<PVector> potentialPosition = new ArrayList<>();
         //N
         potentialPosition.add(new PVector(this.position.x, this.position.y-stepDist));
@@ -198,7 +220,7 @@ public class Tank4 extends Tank {
         potentialPosition.add(new PVector(this.position.x-stepDist, this.position.y-stepDist));
         potentialPosition = calcPotentialMoveActionsUtil(potentialPosition);
 
-        nextPosition = potentialPosition.get(Util.getRndDecision(potentialPosition.size()));
+        PVector nextPosition = potentialPosition.get(Util.getRndDecision(potentialPosition.size()));
         System.out.println("Next: " + nextPosition + " enemy found: " + enemyLocated + " Actions: " + potentialPosition.size());
 
         return nextPosition;
@@ -217,7 +239,7 @@ public class Tank4 extends Tank {
                 tempPositions.add(position);
             }
         }
-        System.out.println("TEMP POSITIONS: " + tempPositions.size() + " TANK ID: " + id);
+        System.out.println("TEMP POSITIONS: " + tempPositions.size() + " TANK ID: " + id + " blocked paths: " + blockedPaths.size());
         return tempPositions;
     }
 
@@ -294,7 +316,7 @@ public class Tank4 extends Tank {
         return 0;
     }
     public boolean hasClearShot(){
-        Sprite obj = getLatestSightSensorReading().obj;
+        Sprite obj = latestSightSensorReadning.obj;
          if(enemyInfocus != null){
 
              if(obj instanceof Tank){
