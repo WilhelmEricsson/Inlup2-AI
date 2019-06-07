@@ -299,7 +299,6 @@ public class Tank4 extends Tank {
         return nextPosition;
     }
 
-    // Finns nog en bättre lösning menmen
     private String calculateDirection(PVector nextPosition) {
         String direction = "";
         if (nextPosition.equals(new PVector(position.x, position.y-stepDist))) {
@@ -321,6 +320,7 @@ public class Tank4 extends Tank {
         }
         return direction;
     }
+    // Tar in en array med positioner och beräknar dessas utility. Det som returneras är en lista med den eller de positioner med högst utility.
 
     private ArrayList<PVector> calcPotentialMoveActionsUtil(ArrayList<PVector> potentialPositions){
         int highestUtil = Integer.MIN_VALUE;
@@ -340,6 +340,7 @@ public class Tank4 extends Tank {
         return tempPositions;
     }
 
+    //Avgör om en position är ett hinder eller ej.
     private boolean isObstacle(PVector pos){
         Iterator<Sprite> obst = obstacles.iterator();
         boolean isObst = false;
@@ -360,6 +361,8 @@ public class Tank4 extends Tank {
 
 
    //BATTLE STATE
+    //Detta är det tillstånd som tanken kommer in i när den lokaliserat fienden, här finns 3 actions: searchState som används när tanken ska
+   // förflytta sig, fire som säger sig själv och en sista action som är att tanken roterar för att sikta på fienden. Från getMostRewardingAction får tanken sitt beslut
     public void battleState(){
         getBestTarget();
         int decision = getMostRewardingAction();
@@ -388,6 +391,7 @@ public class Tank4 extends Tank {
         }
 
     }
+    // Avgör vilken fiende tank som bör bekämpas först, detta baserat fiende tanksens hälsa
     private void getBestTarget(){
         if(enemyInfocus != null) {
             if (enemyInfocus.health <= 0) {
@@ -404,6 +408,7 @@ public class Tank4 extends Tank {
         }
     }
 
+    //returnerar em int som representerar det val som är bäst för stunden
     private int getMostRewardingAction(){
         boolean hasClearShot = hasClearShot();
         if(hasClearShot && hasShot){
@@ -417,6 +422,11 @@ public class Tank4 extends Tank {
 
         return 0;
     }
+
+    /**
+     * @return true if the object returned by the latest sensor reading is the enemy in focus or null and the tank is aiming in the right direction.
+     */
+
     public boolean hasClearShot(){
         Sprite obj = latestSightSensorReadning.obj;
          if(enemyInfocus != null){
@@ -430,6 +440,11 @@ public class Tank4 extends Tank {
          }
         return  false;
     }
+
+    /**
+     *
+     * @return true if heading is within +-3 from the desired aim, else false
+     */
     private boolean aimingInRightDirection(){
         PVector tempTarget = enemyLocatedAt.get(enemyInfocus);
         if (tempTarget != null) {
@@ -447,6 +462,11 @@ public class Tank4 extends Tank {
         //return heading == positionToAimAt.heading();
     }
 
+    /**
+     *
+     * @param position
+     * @return the utility of @param position
+     */
     public int calcMoveActionUtil(PVector position){
         String direction = calculateDirection(position);
 
@@ -482,14 +502,26 @@ public class Tank4 extends Tank {
         }
         return util;
     }
+
+    /**
+     *
+     * @param position
+     * @return true if x and y values are less than 0, if x is larger than the PApplet's width or if y is larger
+     * than the PApplet's height. True when @param position is null and false otherwise.
+     */
     private boolean isOutOfBounds(PVector position){
-        if(position.x < 0 || position.y < 0){
-            return true;
-        }else if(position.x > getTp().width || position.y > getTp().height){
+        try{
+            if(position.x < 0 || position.y < 0){
+                return true;
+            }else if(position.x > getTp().width || position.y > getTp().height){
+                return true;
+            }
+        }catch(NullPointerException npe){
             return true;
         }
         return false;
     }
+
 
     public void drawSensor() {
         getTp().pushMatrix();
@@ -503,7 +535,11 @@ public class Tank4 extends Tank {
         getTp().popMatrix();
     }
 
-
+    /**
+     *
+     * @param utility
+     * @return max value of the array or 0 if length of the param array is 0
+     */
     private int argMax(float[] utility){
         int max = 0;
         for(int i = 1; i < utility.length; i++ ){
