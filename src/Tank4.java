@@ -155,9 +155,11 @@ public class Tank4 extends Tank {
         latestSightSensorReadning = getLatestSightSensorReading();
         Sprite obj = latestSightSensorReadning.obj();
         if (obj != null) {
-            // Rita ut
-            SightSensor sens = (SightSensor)getSensor("SIGHT_SENSOR");
-            sens.drawSensor(latestSightSensorReadning.obj().position);
+            if (getTp().debugOn) {
+                SightSensor sens = (SightSensor)getSensor("SIGHT_SENSOR");
+                sens.drawSensor(latestSightSensorReadning.obj().position);
+            }
+
 
             if (obj instanceof Tank) {
                 Tank tank = (Tank) obj;
@@ -439,6 +441,18 @@ public class Tank4 extends Tank {
             return true;
         }
         return false;
+    }
+
+    public void drawSensor() {
+        getTp().pushMatrix();
+        getTp().fill(0);
+        getTp().translate(position.x, position.y);
+        getTp().rotate(heading);
+        getTp().strokeWeight(2);
+        getTp().line(0, 0, 200,0 );
+        getTp().fill(255, 255, 0);
+        getTp().ellipse(200, 0, 10, 10);
+        getTp().popMatrix();
     }
 
 
