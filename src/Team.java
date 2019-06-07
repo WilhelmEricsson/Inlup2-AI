@@ -1,9 +1,11 @@
 import processing.core.PVector;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 
 class Team {
-
+    private HashSet<Tank> casualties;
     Tank[] tanks = new Tank[3];
     int id; // team red 0, team blue 1.
     int tank_size;
@@ -28,7 +30,9 @@ class Team {
           PVector tank0_startpos, int tank0_id, CannonBall ball0,
           PVector tank1_startpos, int tank1_id, CannonBall ball1,
           PVector tank2_startpos, int tank2_id, CannonBall ball2)
+
     {
+        casualties = new HashSet<>();
         this.tp = tp;
         this.id = team_id;
         this.tank_size = tank_size;
@@ -93,9 +97,16 @@ class Team {
         tp.rect(this.homebase_x, this.homebase_y, this.homebase_width, this.homebase_height);
     }
 
+    boolean isTeamWipedOut(){
+        return tanks.length == casualties.size();
+    }
 
     void displayHomeBase(){
         displayHomeBaseTeam();
+    }
+
+    public void addCasualty(Tank cas){
+        casualties.add(cas);
     }
 
 }

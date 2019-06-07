@@ -23,7 +23,8 @@
         boolean debugOn = false;
         boolean pause = false;
         boolean gameOver = false;
-
+        boolean gameWon = false;
+       Team winner;
         Grid grid;
         int cols = 15;
         int rows = 15;
@@ -154,10 +155,11 @@
 
         @Override
         public void draw() {
+
             background(200);
             Util.checkForInput(); // Kontrollera inmatning.
 
-            if (!gameOver && !pause) {
+            if (!gameOver && !pause && !gameWon) {
                 // timer används inte i dagsläget.
                 timer.tick(); // Alt.1
                 float deltaTime = timer.getDeltaSec();
@@ -186,7 +188,7 @@
                 // CHECK FOR COLLISIONS
                 Util.checkForCollisionsShots();
                 Util.checkForCollisionsTanks();
-
+                checkIfThereIsAWinner();
             }
 
             // UPDATE DISPLAY
@@ -209,6 +211,15 @@
 
         }
 
+        private void checkIfThereIsAWinner(){
+           if(teams[0].isTeamWipedOut()){
+               winner = teams[1];
+               gameWon = true;
+           }else if(teams[1].isTeamWipedOut()){
+               winner = teams[0];
+               gameWon = true;
+           }
+        }
 
         // Används inte
         float getTime() {

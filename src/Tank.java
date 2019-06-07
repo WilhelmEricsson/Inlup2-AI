@@ -372,7 +372,7 @@ class Tank extends Sprite {
                 this.isDestroyed = true;
                 this.isSpinning  = false;
                 this.isReady = false;
-
+                team.addCasualty(this);
                 return true;
             }
 

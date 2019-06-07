@@ -299,6 +299,12 @@ public class Util {
             tp.fill(30);
             tp.text("Game Over!", tp.width / 2 - 100, tp.height / 2);
         }
+        if(tp.gameWon){
+            tp.textSize(36);
+            tp.fill(30);
+            tp.text("Team " + tp.winner.id +
+                    " Won!", tp.width / 2 - 100, tp.height / 2);
+        }
     }
 
     //**************************************************
