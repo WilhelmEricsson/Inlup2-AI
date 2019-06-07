@@ -26,6 +26,7 @@ class Team {
 
     int numberOfHits; // sammalagda antalet bekräftade träffar på andra lagets tanks.
 
+    // Lista av meddelanden
     private LinkedList<TankMessage> messages = new LinkedList<>();
 
     TankProg tp;
@@ -73,6 +74,7 @@ class Team {
 
     }
 
+    // Lägger till ett meddelande i messages vilket senare andra tanks kan läsa av
     public void addMessage(TankMessage message) {
         messages.add(message);
         for(Tank t: tanks) {
