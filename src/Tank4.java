@@ -427,11 +427,19 @@ public class Tank4 extends Tank {
     }
     private boolean aimingInRightDirection(){
         PVector tempTarget = enemyLocatedAt.get(enemyInfocus);
-        PVector target = new PVector(tempTarget.x,tempTarget.y);
-        PVector me = new PVector(this.position.x, this.position.y);
-        PVector positionToAimAt = PVector.sub(target, me);
+        if (tempTarget != null) {
+            PVector target = new PVector(tempTarget.x,tempTarget.y);
+            PVector me = new PVector(this.position.x, this.position.y);
+            PVector positionToAimAt = PVector.sub(target, me);
 
-        return heading == positionToAimAt.heading();
+            if (getTp().degrees(heading) < getTp().degrees(positionToAimAt.heading())+3 && getTp().degrees(heading) > getTp().degrees(positionToAimAt.heading())-3) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+        return false;
+        //return heading == positionToAimAt.heading();
     }
 
     public int calcMoveActionUtil(PVector position){
