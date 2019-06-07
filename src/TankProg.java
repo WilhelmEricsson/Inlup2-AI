@@ -198,6 +198,13 @@
             Util.updateTanksDisplay();
             Util.updateShotsDisplay();
 
+            if (debugOn) {
+                for(Tank t: allTanks) {
+                    if (t instanceof Tank4) {
+                        ((Tank4) t).drawSensor();
+                    }
+                }
+            }
 
             Util.showGUI();
 
