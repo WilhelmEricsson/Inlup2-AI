@@ -28,31 +28,33 @@ public class Tank4 extends Tank {
         enemyLocated = false;
         this.started = false;
         blockedPaths = new HashSet<>();
-       SensorReading latestSightSensorReadning = new SensorReading();
+        latestSightSensorReadning = new SensorReading();
     }
 
 
-    // Send message to all other Tanks in Team
-    // Send message to all other Tanks in Team
-    protected void sendMessageToTeam(String message, PVector position) {
+    // Skickar ett meddelande till alla andra tanks i laget
+    private void sendMessageToTeam(String message, PVector position) {
         team.addMessage(new TankMessage(id, message, position));
     }
 
-    // Called by team when someone sends a message
-    // Tanks should check every frame if messageReceived is true,
-    // if it is they should use the getMessageRecieved method and deal with it accordingly
-    protected void receiveMessageFromTeam(TankMessage message) {
+    // Kallad av team när någon skickar ett meddelande
+    // Tanks kollar varje varv ifall message recieved är true
+    // när den är detta hanterar de meddelandet och sätter den till false
+    public void receiveMessageFromTeam(TankMessage message) {
         messageReceived = true;
     }
 
-    // Returns the latest message from the list of messages in Team
-    protected TankMessage getMessageReceived() {
+    // Returnerar det senaste meddelandet från team:ets lista messages
+    private TankMessage getMessageReceived() {
         messageReceived = false;
         return team.getLatestMessage();
     }
 
-    // Reads sensor value for of SightSensor given the sprite, returns true if it was in the tanks field of view
-    protected void readSightSensor(Sprite sprite) {
+    // Använder SightSensor för att kolla ifall sprite är inom tankens synfält
+    // Ifall inte samt att inget annan objekt är närmre så läggs den till i SightSensor objektet latestReading
+    // Denna metod anropas i checkCollision() (båda) och efter alla träd och tankar har gåtts igenom
+    // kommer latestReading vara det närmaste objektet i synfältet ifall det finns något
+    private void readSightSensor(Sprite sprite) {
         SightSensor sens = (SightSensor) getSensor("SIGHT_SENSOR");
 
         if (sprite instanceof Tree) {
@@ -62,7 +64,8 @@ public class Tank4 extends Tank {
         }
     }
 
-    public SensorReading getLatestSightSensorReading() {
+    // Returnerar det närmaste objektet inom 200 (Pvector.dist)
+    private SensorReading getLatestSightSensorReading() {
         return ((SightSensor) getSensor("SIGHT_SENSOR")).getLatestReading();
     }
 
@@ -70,13 +73,6 @@ public class Tank4 extends Tank {
     public void checkCollision(Tree other){
         super.checkCollision(other);
         readSightSensor(other);
-        /*
-        if(readSightSensor(other)){
-            if(!obstacles.contains(other)){
-                obstacles.add(other);
-            }
-        }*/
-
     }
     @Override
     public void checkCollision(Tank other){
@@ -84,22 +80,8 @@ public class Tank4 extends Tank {
         if (this.id != other.id) {
             readSightSensor(other);
         }
-        /*
-        if(readSightSensor(other)){
-            if(other.getTeam().id != this.getTeam().id){
-                enemyLocated = true;
-                enemyInfocus = other;
-                enemyLocatedAt.put(other,other.position);
-                sendMessageToTeam("Enemy Located!", other.position);
-            }
-        }*/
-
     }
 
-    @Override
-    public void checkEnvironment(){
-        super.checkEnvironment();
-    }
     private boolean isFrontTowardsNextPosition(){
         PVector tempTargetPosition = nextPosition;
         PVector targetPosition = new PVector(tempTargetPosition.x,tempTargetPosition.y);
@@ -114,15 +96,13 @@ public class Tank4 extends Tank {
     // Tanken meddelas om kollision med trädet.
     public void message_collision(Tree other) {
         System.out.println("*** Team"+this.team_id+".Tank["+ this.getId() + "].collision(Tree)");
-
-        //rotateTo(grid.getRandomNodePosition());
     }
 
+    // Lägger till positionen i team:ets lista för redan sökta positioner
     @Override
     public void arrived() {
         super.arrived();
         System.out.println("*** Team"+this.team_id+".Tank["+ this.getId() + "].arrived()");
-        //((Team1)getTeam()).addSearchedArea(this.position);
 
         if (this.getTeam().getId() == 0) {
             if(((Team1)team).isPosistionSearched(position)){
@@ -133,39 +113,21 @@ public class Tank4 extends Tank {
                 ((Team2)getTeam()).addSearchedArea(this.position);
             }
         }
-
-        //isMoving = false;
-        //moveTo(new PVector(int(random(width)),int(random(height))));
-        //moveTo(grid.getRandomNodePosition());
-        //this.isMoving = false;
     }
+
 
     @Override
     public void arrivedRotation() {
         super.arrivedRotation();
-
         lastPosition = new PVector(position.x, position.y);
-
         moveTo(nextPosition);
-
-        //isMoving = true;
     }
 
-    /*
-    private boolean isPathBlocked(){
-        boolean isPathBlocked = false;
-        Sprite tempObj = latestSightSensorReadning.obj;
-        if(tempObj != null){
-            if(this.position.dist(tempObj.position) < this.position.dist(nextPosition)){
-                isPathBlocked = true;
-            }
-        }
-        return isPathBlocked;
-    }*/
-
+    // Hanterar tankens logik, bestämmer ifall den ska söka eller försöka skjuta en fiende
+    // Tar också hand om kollisioner för att se till att tanken inte fastnar
     @Override
     public void updateLogic() {
-        // Ifall tanken krockade kolla ifall den kom längre än 25 dist från förra, ifall inte så blockera den riktningen
+        // Ifall tanken krockade kolla ifall den kom längre än 25 dist från förra positionen, ifall inte så blockera den riktningen
         if (collided) {
             if (lastPosition.dist(position) < 25) {
                 blockedPaths.add(lastDirection);
@@ -174,8 +136,7 @@ public class Tank4 extends Tank {
             collided = false;
         }
 
-        SensorReading reading = getLatestSightSensorReading();
-        Sprite obj = reading.obj();
+        // Läser av SightSensor
         readSensor();
 
         if(messageReceived){
@@ -191,6 +152,9 @@ public class Tank4 extends Tank {
         }
         resetSightSensorReading();
     }
+
+    // Skickar ett meddelande till laget ifall SightSensor upptäcker en fiende
+    // lägger också till Träd i obstacles ifall ett sådant upptäcks
     private void readSensor(){
         latestSightSensorReadning = getLatestSightSensorReading();
         Sprite obj = latestSightSensorReadning.obj();
@@ -227,7 +191,9 @@ public class Tank4 extends Tank {
         }
     }
 
-    //SEARCH STATE -- Random search, with preference to position located further away from home base/starting position
+    // Tanken gör en sökning för att hitta fienden
+    // I början är fiendens position okänd och det är en slumpmässig sökning
+    // sökningen försöker dock att undvika platser den redan varit på
     public void searchState(){
         if(!isDestroyed && !isImmobilized){
             nextPosition = getNextPosition();
@@ -236,6 +202,7 @@ public class Tank4 extends Tank {
             turnTurretTowardsEnemy();
         }
     }
+
     private void turnTurretTowardsEnemy(){
         if(enemyInfocus != null && !aimingInRightDirection()){
             turnLeft_state();
@@ -244,10 +211,11 @@ public class Tank4 extends Tank {
         }
     }
 
-
+    // Lägger fiendens position från ett meddelande i en HashMap
+    // Detta används senare i Utility Function:en för att välja riktning,
+    // riktningar vilket är närmre fienden kommer föredras
     private void receiveMessage(){
         TankMessage tankMessage = getMessageReceived();
-
         if(tankMessage.getMessage() == MESSAGE[0]){
             System.out.println("Message from: " + tankMessage.getSender() + " - "  + tankMessage.getMessage()+  " " + tankMessage.getPosition().toString());
             enemyLocated = true;
@@ -255,7 +223,12 @@ public class Tank4 extends Tank {
         }
     }
 
-
+    // Returnerar tankens nästa position
+    // Olika beronde på vilket state och input från sensorer
+    // I början blir positionen slumpmässig
+    // Ifall en fiende har lokaliserats föredras positioner nära fienden
+    // Hanterar också blockerade vägar för att se till att tanken inte blir fast
+    // Ifall t.ex. positionen norr är närmast fienden men denna väg är även blockerad måste tanken tvingas ta en annan
     private PVector getNextPosition(){
         ArrayList<PVector> potentialPosition = new ArrayList<>();
         //N
@@ -299,7 +272,7 @@ public class Tank4 extends Tank {
         return nextPosition;
     }
 
-    // Finns nog en bättre lösning menmen
+    // Returnerar riktningen i vädersträck
     private String calculateDirection(PVector nextPosition) {
         String direction = "";
         if (nextPosition.equals(new PVector(position.x, position.y-stepDist))) {

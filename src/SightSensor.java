@@ -6,6 +6,9 @@ import processing.core.PVector;
 
 import static processing.core.PApplet.*;
 
+// Används som en syn-sensor
+// Sensorn kan läsa av 200 Pvector.dist framför tanken i dess riktning
+// Ifall flera objekt befinner sig i den riktningen så syns bara det närmsta
 public class SightSensor extends Sensor {
 
     Sprite closestObject = null;
@@ -16,11 +19,15 @@ public class SightSensor extends Sensor {
         latestReading = new SensorReading();
     }
 
+    // Returnerar det närmasta objektet i tankens färdriktning inom 200, ifall det finns
+    // Denna ska bara anropas efter varje objekt på speplanen har gåtts igenom
     public SensorReading getLatestReading() {
         SensorReading temp = latestReading;
         return temp;
     }
 
+    // Efter att alla Sprites har gåtts igenom måste sensorn återställas så att inte
+    // det senaste hittade objektet blir kvar trots att den försvunnit ut synfältet
     public void reset() {
         closestObject = null;
         latestReading = new SensorReading();
@@ -33,7 +40,9 @@ public class SightSensor extends Sensor {
         getTank().getTp().popMatrix();
     }
 
-    // ty http://jeffreythompson.org/collision-detection/line-circle.php
+    // Ska varje varv anropas av varje Tank en gång för varje Sprite på spelplanen (förutom sig själv)
+    // När en Tank gått igenom alla andra Sprites kommer den kunna använda getLatestReading() för att
+    // returnera den som är närmast ifall det finns någon
     public void readValue(Sprite read, int radius){
         PVector temp = tank.readSensor_distance(tank.getSensor("ULTRASONIC_FRONT")).obj.position;
         boolean hit = lineCircle(tank.position.x, tank.position.y, temp.x, temp.y, read.position.x, read.position.y, radius);
@@ -48,78 +57,10 @@ public class SightSensor extends Sensor {
                 }
             }
         }
-
-
-        /*
-        PVector checkPos = read.position;
-        SensorReading sr = new SensorReading();
-
-        PVector temp = PVector.fromAngle(tank.heading);
-                //tank.readSensor_distance(tank.getSensor("ULTRASONIC_FRONT")).obj.position;
-        temp.normalize();
-        temp.mult(200);
-        //System.out.println("TEST: " + temp.toString());
-        tank.getTp().pushMatrix();
-        tank.getTp().translate(tank.position.x,tank.position.y);
-        tank.getTp().ellipse(temp.x,temp.y,20 ,20);
-        tank.getTp().line(0, 0, temp.x, temp.y);
-        tank.getTp().popMatrix();
-
-        PVector t = new PVector(tank.position.x, tank.position.y);
-        PVector sub = PVector.sub(temp, t);
-
-        // https://forum.processing.org/two/discussion/90/point-and-line-intersection-detection
-        // Checks if sub is intersected by an ellipse which position is checkPos with the giver radius
-        float a = sub.y / sub.x;
-        float b = t.y - a * t.x;
-
-        float A = (1 + a * a);
-        float B = (2 * a *( b - checkPos.y) - 2 * checkPos.x);
-        float C = (checkPos.x * checkPos.x + (b - checkPos.y) * (b - checkPos.y)) - (radius * radius);
-        float delta = B * B - 4 * A * C;
-
-        PVector pos1 = new PVector(0,0);
-        PVector pos2 = new PVector(0,0);
-        boolean posFound = false;
-
-        if (delta >= 0) {
-            float x1 = (-B - sqrt(delta)) / (2 * A);
-            float y1 = a * x1 + b;
-
-            float x2 = (-B + sqrt(delta)) / (2 * A);
-            float y2 = a * x2 + b;
-
-            if ((x1 > min(t.x, temp.x)) && (x1 < max(t.x, temp.x)) && (y1 > min(t.y, temp.y)) && (y1 < max(t.y, temp.y))) {
-                pos1 = new PVector(x1,y1);
-                posFound = true;
-            }
-            if ((x2 > min(t.x, temp.x)) && (x2 < max(t.x, temp.x)) && (y2 > min(t.y, temp.y)) && (y2 < max(t.y, temp.y))) {
-                pos2 = new PVector(x2,y2);
-                posFound = true;
-            }
-
-            if (t.dist(pos1) < t.dist(pos2)) {
-                tank.getTp().pushMatrix();
-                tank.getTp().fill(255, 255, 0);
-                tank.getTp().ellipse(pos1.x, pos1.y, 25, 25);
-                tank.getTp().popMatrix();
-                intersectPoint = pos1;
-            } else {
-                tank.getTp().pushMatrix();
-                tank.getTp().fill(255, 255, 0);
-                tank.getTp().ellipse(pos2.x, pos2.y, 25, 25);
-                tank.getTp().popMatrix();
-                intersectPoint = pos2;
-            }
-
-            if (posFound) {
-                sr = new SensorReading(read, PVector.dist(t, checkPos), 0F);
-            }
-        }
-        latestReading = sr;
-        return sr;
-        */
     }
+
+    // Metoder nedan är inte skrivna av oss utan kommer härifrån:
+    // http://jeffreythompson.org/collision-detection/line-circle.php
 
     // LINE/CIRCLE
     boolean lineCircle(float x1, float y1, float x2, float y2, float cx, float cy, float r) {
