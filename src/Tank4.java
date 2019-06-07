@@ -205,7 +205,7 @@ public class Tank4 extends Tank {
 
     private void turnTurretTowardsEnemy(){
         if(enemyInfocus != null && !aimingInRightDirection()){
-            turnLeft_state();
+            turnTurretLeft_state();
         }else{
             stopTurretTurning_state();
         }
@@ -348,10 +348,8 @@ public class Tank4 extends Tank {
                 }
                 break;
             case 1:
-                if(idle_state && hasClearShot()){
-                    fire();
-                }
-
+                stopMoving_state();
+                fire();
                 break;
             case 2:
                 if(idle_state) {
@@ -397,7 +395,6 @@ public class Tank4 extends Tank {
             System.out.println("TEST 2 "+ id);
             return 2;
         }*/
-
 
         return argMax(actionUtils);
     }

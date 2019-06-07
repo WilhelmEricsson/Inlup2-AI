@@ -1227,15 +1227,6 @@ class Tank extends Sprite {
 
     //**************************************************
     final void display() {
-        // ritar ut prick från ultrasonic front sensor
-        if (id == 0) {
-            PVector temp = readSensor_distance(getSensor("ULTRASONIC_FRONT")).obj.position;
-            tp.pushMatrix();
-            tp.fill(200, 0, 0);
-            tp.ellipse(temp.x, temp.y, 10, 10);
-            tp.popMatrix();
-        }
-
         tp.imageMode(tp.CENTER);
         tp.pushMatrix();
         tp.translate(this.position.x, this.position.y);
