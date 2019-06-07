@@ -1,3 +1,7 @@
+/**
+ * Wilhelm Ericsson
+ * Ruben Wilhelmsen
+ */
 import processing.core.PImage;
 import processing.core.PVector;
 

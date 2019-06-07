@@ -1,6 +1,11 @@
+/**
+ * Wilhelm Ericsson
+ * Ruben Wilhelmsen
+ */
 import processing.core.PApplet;
 
 import java.lang.reflect.InvocationTargetException;
+
 import java.lang.reflect.Method;
 
 public class State {

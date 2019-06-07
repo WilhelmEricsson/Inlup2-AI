@@ -1,3 +1,7 @@
+/**
+ * Wilhelm Ericsson
+ * Ruben Wilhelmsen
+ */
 // Används ännu inte.
 //import processing.core.*;
 

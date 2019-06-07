@@ -1,3 +1,7 @@
+/**
+ * Wilhelm Ericsson
+ * Ruben Wilhelmsen
+ */
 class SensorReading {
     float distance;
     float heading;

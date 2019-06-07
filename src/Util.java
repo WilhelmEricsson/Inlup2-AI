@@ -1,4 +1,7 @@
-
+/**
+ * Wilhelm Ericsson
+ * Ruben Wilhelmsen
+ */
 import processing.core.*;
 
 import java.util.Random;

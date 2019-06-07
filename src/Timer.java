@@ -1,4 +1,8 @@
 /**
+ * Wilhelm Ericsson
+ * Ruben Wilhelmsen
+ */
+/**
  * A ticker class to manage animation timing.
  */
 public class Timer{

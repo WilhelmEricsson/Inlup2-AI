@@ -54,6 +54,10 @@ if(game.isInState(someState){
 
 */
 
+/**
+ * Wilhelm Ericsson
+ * Ruben Wilhelmsen
+ */
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
