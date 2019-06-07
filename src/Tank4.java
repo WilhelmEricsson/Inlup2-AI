@@ -26,6 +26,41 @@ public class Tank4 extends Tank {
        SensorReading latestSightSensorReadning = new SensorReading();
     }
 
+
+    // Send message to all other Tanks in Team
+    // Send message to all other Tanks in Team
+    protected void sendMessageToTeam(String message, PVector position) {
+        team.addMessage(new TankMessage(id, message, position));
+    }
+
+    // Called by team when someone sends a message
+    // Tanks should check every frame if messageReceived is true,
+    // if it is they should use the getMessageRecieved method and deal with it accordingly
+    protected void receiveMessageFromTeam(TankMessage message) {
+        messageReceived = true;
+    }
+
+    // Returns the latest message from the list of messages in Team
+    protected TankMessage getMessageReceived() {
+        messageReceived = false;
+        return team.getLatestMessage();
+    }
+
+    // Reads sensor value for of SightSensor given the sprite, returns true if it was in the tanks field of view
+    protected void readSightSensor(Sprite sprite) {
+        SightSensor sens = (SightSensor) getSensor("SIGHT_SENSOR");
+
+        if (sprite instanceof Tree) {
+            sens.readValue(sprite, 50);
+        } else {
+            sens.readValue(sprite, 25);
+        }
+    }
+
+    public SensorReading getLatestSightSensorReading() {
+        return ((SightSensor) getSensor("SIGHT_SENSOR")).getLatestReading();
+    }
+
     @Override
     public void checkCollision(Tree other){
         super.checkCollision(other);
@@ -325,7 +360,7 @@ public class Tank4 extends Tank {
                 }
                 break;
             case 1:
-                if(idle_state && hasClearShot()){
+                if(hasClearShot()){
                     fire();
                 }
 
@@ -359,7 +394,7 @@ public class Tank4 extends Tank {
             System.out.println("TEST 1");
             stopMoving_state();
             return 1;
-        }else if (idle_state && !hasClearShot && enemyInfocus != null){
+        }else if (idle_state && !hasClearShot && enemyInfocus != null && !aimingInRightDirection()){
             System.out.println("TEST 2");
             rotateTo(enemyInfocus.position);
         }
@@ -367,7 +402,7 @@ public class Tank4 extends Tank {
         return 0;
     }
     public boolean hasClearShot(){
-        Sprite obj = latestSightSensorReadning.obj;
+        Sprite obj = getLatestSightSensorReading().obj;
          if(enemyInfocus != null){
 
              if(obj instanceof Tank){

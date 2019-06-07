@@ -72,8 +72,10 @@ class Team {
     public void addMessage(TankMessage message) {
         messages.add(message);
         for(Tank t: tanks) {
-            if (message.getSender() != t.getId()) {
-                t.receiveMessageFromTeam(message);
+            if (t instanceof Tank4) {
+                if (message.getSender() != t.getId()) {
+                    ((Tank4) t).receiveMessageFromTeam(message);
+                }
             }
         }
     }

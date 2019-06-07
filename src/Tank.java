@@ -1002,6 +1002,7 @@ class Tank extends Sprite {
         if ((this.position.y+r > tp.height) || (this.position.y-r < 0) ||
                 (this.position.x+r > tp.width) || (this.position.x-r < 0)) {
             if (!this.stop_state) {
+                collided = true;
                 this.position.set(this.positionPrev); // Flytta tillbaka.
                 //println("***");
                 stopMoving_state();
@@ -1039,40 +1040,6 @@ class Tank extends Sprite {
         //println("Tank.COLLISION");
     }
 
-    // Send message to all other Tanks in Team
-    // Send message to all other Tanks in Team
-    protected void sendMessageToTeam(String message, PVector position) {
-        team.addMessage(new TankMessage(id, message, position));
-    }
-
-    // Called by team when someone sends a message
-    // Tanks should check every frame if messageReceived is true,
-    // if it is they should use the getMessageRecieved method and deal with it accordingly
-    protected void receiveMessageFromTeam(TankMessage message) {
-        messageReceived = true;
-    }
-
-    // Returns the latest message from the list of messages in Team
-    protected TankMessage getMessageReceived() {
-        messageReceived = false;
-        return team.getLatestMessage();
-    }
-
-    // Reads sensor value for of SightSensor given the sprite, returns true if it was in the tanks field of view
-    protected void readSightSensor(Sprite sprite) {
-        SightSensor sens = (SightSensor) getSensor("SIGHT_SENSOR");
-
-        if (sprite instanceof Tree) {
-            sens.readValue(sprite, 50);
-        } else {
-            sens.readValue(sprite, 25);
-        }
-    }
-
-    public SensorReading getLatestSightSensorReading() {
-        return ((SightSensor) getSensor("SIGHT_SENSOR")).getLatestReading();
-    }
-
     public void resetSightSensorReading() {
         ((SightSensor) getSensor("SIGHT_SENSOR")).reset();
     }
@@ -1082,7 +1049,6 @@ class Tank extends Sprite {
     //**************************************************
     public void checkCollision(Tree other) {
 
-        readSightSensor(other);
         //println("*** Tank.checkCollision(Tree)");
         // Check for collisions with "no Smart Objects", Obstacles (trees, etc.)
 
@@ -1129,9 +1095,6 @@ class Tank extends Sprite {
     // Called from environment
     // Keeps an array with vectors to the other tanks, so the tank object can access the other tanks when called for.
     void checkCollision(Tank other) {
-        if (other.id != this.id) {
-            readSightSensor(other);
-        }
 
         //println("*** Tank.checkCollision(Tank)");
         // Check for collisions with "Smart Objects", other Tanks.
