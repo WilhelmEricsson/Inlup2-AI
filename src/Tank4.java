@@ -199,11 +199,18 @@ public class Tank4 extends Tank {
             if (obj instanceof Tank) {
                 Tank tank = (Tank) obj;
                 if(tank.getTeam().id != this.getTeam().id){
-                    enemyLocated = true;
-                    enemyInfocus = tank;
-                    if((!enemyLocatedAt.containsKey(tank)|| enemyLocatedAt.get(tank) != tank.position) && tank.health > 0){
-                        enemyLocatedAt.put(tank,tank.position);
-                        sendMessageToTeam("Enemy Located!", tank.position);
+                    if(tank.health <= 0 && enemyLocatedAt.containsKey(tank)){
+                        enemyLocatedAt.remove(tank);
+                        if(enemyLocatedAt.isEmpty()){
+                            enemyLocated = false;
+                        }
+                    }else {
+                        enemyLocated = true;
+                        enemyInfocus = tank;
+                        if ((!enemyLocatedAt.containsKey(tank) || enemyLocatedAt.get(tank) != tank.position) && tank.health > 0) {
+                            enemyLocatedAt.put(tank, tank.position);
+                            sendMessageToTeam("Enemy Located!", tank.position);
+                        }
                     }
                 }
             } else {
@@ -265,7 +272,6 @@ public class Tank4 extends Tank {
         potentialPosition = calcPotentialMoveActionsUtil(potentialPosition);
 
         PVector nextPosition = potentialPosition.get(Util.getRndDecision(potentialPosition.size()));
-        nextPosition = potentialPosition.get(Util.getRndDecision(potentialPosition.size()));
 
         // Ifall tanken kom mer än 100 dist ifrån förra positionen så är det lugnt och blockePaths clear:as
         if (lastPosition.dist(position) > 100) {
@@ -360,10 +366,15 @@ public class Tank4 extends Tank {
                 }
                 break;
             case 1:
-                if(hasClearShot()){
+                if(idle_state && hasClearShot()){
                     fire();
                 }
 
+                break;
+            case 2:
+                if(idle_state) {
+                    rotateTo(enemyInfocus.position);
+                }
                 break;
 
             default:
@@ -391,18 +402,18 @@ public class Tank4 extends Tank {
     private int getMostRewardingAction(){
         boolean hasClearShot = hasClearShot();
         if(hasClearShot && hasShot){
-            System.out.println("TEST 1");
+            System.out.println("TEST 1 "+ id);
             stopMoving_state();
             return 1;
-        }else if (idle_state && !hasClearShot && enemyInfocus != null && !aimingInRightDirection()){
-            System.out.println("TEST 2");
-            rotateTo(enemyInfocus.position);
+        }else if (idle_state && enemyInfocus != null && !aimingInRightDirection()){
+            System.out.println("TEST 2 "+ id);
+            return 2;
         }
 
         return 0;
     }
     public boolean hasClearShot(){
-        Sprite obj = getLatestSightSensorReading().obj;
+        Sprite obj = latestSightSensorReadning.obj;
          if(enemyInfocus != null){
 
              if(obj instanceof Tank){
@@ -427,7 +438,7 @@ public class Tank4 extends Tank {
         String direction = calculateDirection(position);
 
         int util = -1;
-        if(isObstacle(position) || blockedPaths.contains(direction)){
+        if(isObstacle(position) || blockedPaths.contains(direction) || isOutOfBounds(position)){
             util = Integer.MIN_VALUE;
             return util;
         }
@@ -457,6 +468,14 @@ public class Tank4 extends Tank {
 
         }
         return util;
+    }
+    private boolean isOutOfBounds(PVector position){
+        if(position.x < 0 || position.y < 0){
+            return true;
+        }else if(position.x > getTp().width || position.y > getTp().height){
+            return true;
+        }
+        return false;
     }
 
     public void drawSensor() {
