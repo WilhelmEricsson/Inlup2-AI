@@ -18,9 +18,6 @@ class Team2 extends Team {
         tanks[0] = new Tank4(tank0_id, this, this.tank0_startpos, this.tank_size, ball0, tp);
         tanks[1] = new Tank4(tank1_id, this, this.tank1_startpos, this.tank_size, ball1, tp);
         tanks[2] = new Tank4(tank2_id, this, this.tank2_startpos, this.tank_size, ball2, tp);
-
-        //this.homebase_x = width - 151;
-        //this.homebase_y = height - 351;
     }
 
     public void addSearchedArea(PVector position){
@@ -29,13 +26,4 @@ class Team2 extends Team {
     public boolean isPosistionSearched(PVector position){
         return searchedArea.contains(position);
     }
-
-    void updateLogic() {
-        //for (int i = 0; i < tanks.length; i++) {
-        //  tanks[i].updateLogic();
-        //}
-    }
-
-    //==================================================
-
 }
