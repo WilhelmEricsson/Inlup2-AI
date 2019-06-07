@@ -343,7 +343,7 @@ public class Tank4 extends Tank {
 
         switch (decision){
             case 0:
-                if(idle_state){
+                if(idle_state && !isMoving){
                     searchState();
                 }
                 break;
