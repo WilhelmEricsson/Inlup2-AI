@@ -352,7 +352,7 @@ public class Tank4 extends Tank {
                 fire();
                 break;
             case 2:
-                if(idle_state) {
+                if(idle_state && !isMoving) {
                     rotateTo(enemyInfocus.position);
                 }
                 break;
@@ -387,14 +387,6 @@ public class Tank4 extends Tank {
         actionUtils[0] = calcBattleStateMoveActionUtil(hasClearShot);
         actionUtils[1] = calculateFireActionUtil(hasClearShot);
         actionUtils[2] = calcRotationUtil();
-        /*if(hasClearShot && hasShot){
-            System.out.println("TEST 1 "+ id);
-            stopMoving_state();
-            return 1;
-        }else if (idle_state && enemyInfocus != null && !aimingInRightDirection()){
-            System.out.println("TEST 2 "+ id);
-            return 2;
-        }*/
 
         return argMax(actionUtils);
     }
