@@ -384,19 +384,69 @@ public class Tank4 extends Tank {
 
     //returnerar em int som representerar det val som är bäst för stunden
     private int getMostRewardingAction(){
+        int[] actionUtils = new int[3];
         boolean hasClearShot = hasClearShot();
-        if(hasClearShot && hasShot){
+        actionUtils[0] = calcBattleStateMoveActionUtil(hasClearShot);
+        actionUtils[1] = calculateFireActionUtil(hasClearShot);
+        actionUtils[2] = calcRotationUtil();
+        /*if(hasClearShot && hasShot){
             System.out.println("TEST 1 "+ id);
             stopMoving_state();
             return 1;
         }else if (idle_state && enemyInfocus != null && !aimingInRightDirection()){
             System.out.println("TEST 2 "+ id);
             return 2;
-        }
+        }*/
 
-        return 0;
+
+        return argMax(actionUtils);
     }
+    private int calculateFireActionUtil(boolean hasClearShot){
+        int util = 0;
 
+        if(hasShot){
+            if(aimingInRightDirection()){
+                if(hasClearShot){
+                    util += 1000;
+                }else {
+                    util = Integer.MIN_VALUE;
+                }
+            }else{
+                util = Integer.MIN_VALUE;
+            }
+        }else{
+            util = Integer.MIN_VALUE;
+        }
+        return util;
+    }
+    private int calcBattleStateMoveActionUtil(boolean hasClearShot){
+        int util = 0;
+        if(hasShot){
+            if(aimingInRightDirection()){
+               if(hasClearShot){
+                   util = Integer.MIN_VALUE;
+               }else {
+                   util = 1000;
+               }
+            }
+        }else{
+            util = 1000;
+        }
+        return util;
+    }
+    private int calcRotationUtil(){
+        int util;
+        if(hasShot && enemyInfocus != null){
+             if(!aimingInRightDirection()){
+                 util = 1000;
+             }else{
+                 util = Integer.MIN_VALUE;
+             }
+        }else{
+            util = Integer.MIN_VALUE;
+        }
+        return util;
+    }
     /**
      * @return true if the object returned by the latest sensor reading is the enemy in focus or null and the tank is aiming in the right direction.
      */
@@ -514,14 +564,13 @@ public class Tank4 extends Tank {
      * @param utility
      * @return max value of the array or 0 if length of the param array is 0
      */
-    private int argMax(float[] utility){
+    private int argMax(int[] utility){
         int max = 0;
         for(int i = 1; i < utility.length; i++ ){
             if(utility[max] < utility[i]){
                 max = i;
             }
         }
-        System.err.println("TANK_ID: " + id + " util: " + utility[max] + " arg: " + max);
         return max;
     }
 }
